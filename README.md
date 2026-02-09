@@ -40,7 +40,7 @@ A comprehensive, enterprise-level restaurant management platform built with Djan
 ## 🛠️ Technology Stack
 
 ### Backend
-- **Framework**: Django 5.1 + Django REST Framework 3.16
+- **Framework**: Django 5.1.14 (security patched)
 - **Database**: PostgreSQL 16 (SQLite for development)
 - **Caching**: Redis 7.1
 - **Task Queue**: Celery 5.6
