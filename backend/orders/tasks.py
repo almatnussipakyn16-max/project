@@ -111,6 +111,8 @@ def notify_restaurant_new_order(order_id):
     )
     
     # Send email to restaurant
+    items_list = '\n'.join([f'- {item.menu_item.name} x{item.quantity}' for item in order.items.all()])
+    
     subject = f'New Order - #{order.order_number}'
     message = f"""
     New order received!
@@ -121,7 +123,7 @@ def notify_restaurant_new_order(order_id):
     Type: {order.order_type}
     
     Items:
-    {chr(10).join([f'- {item.menu_item.name} x{item.quantity}' for item in order.items.all()])}
+    {items_list}
     
     View order: {frontend_url}/dashboard/orders/{order.id}
     """

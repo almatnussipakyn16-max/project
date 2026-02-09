@@ -63,6 +63,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
         conflicts = []
         for res in conflicting_reservations:
             res_datetime = datetime.combine(res.reservation_date, res.reservation_time)
+            # Make timezone-aware for proper comparison
+            if timezone.is_naive(res_datetime):
+                res_datetime = timezone.make_aware(res_datetime)
+            
             if time_window_start_dt <= res_datetime <= time_window_end_dt:
                 conflicts.append(res.table_id)
         
