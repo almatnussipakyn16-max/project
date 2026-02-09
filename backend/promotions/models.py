@@ -30,6 +30,7 @@ class Promotion(models.Model):
     
     # Conditions
     minimum_order_amount = models.DecimalField(_('minimum order amount'), max_digits=10, decimal_places=2, default=0.00)
+    max_discount = models.DecimalField(_('max discount'), max_digits=10, decimal_places=2, blank=True, null=True)
     
     is_active = models.BooleanField(_('active'), default=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -43,3 +44,32 @@ class Promotion(models.Model):
     
     def __str__(self):
         return f'{self.code} - {self.name}'
+    
+    @property
+    def title(self):
+        """Alias for name field for backward compatibility."""
+        return self.name
+    
+    @property
+    def min_order_amount(self):
+        """Alias for minimum_order_amount field for backward compatibility."""
+        return self.minimum_order_amount
+    
+    def is_valid(self):
+        """Check if promotion is valid."""
+        from django.utils import timezone
+        now = timezone.now()
+        
+        # Check if active
+        if not self.is_active:
+            return False
+        
+        # Check date range
+        if now < self.start_date or now > self.end_date:
+            return False
+        
+        # Check max uses
+        if self.max_uses is not None and self.current_uses >= self.max_uses:
+            return False
+        
+        return True
