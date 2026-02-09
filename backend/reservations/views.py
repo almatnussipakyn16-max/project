@@ -3,8 +3,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.db.models import Q
+from django.utils import timezone
 from .models import Table, Reservation
 from .serializers import TableSerializer, ReservationSerializer
+from .tasks import send_reservation_confirmation
 
 
 class TableViewSet(viewsets.ModelViewSet):
@@ -35,6 +37,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # Parse date and time
         reservation_date = datetime.strptime(date, '%Y-%m-%d').date()
         reservation_time = datetime.strptime(time, '%H:%M').time()
+        reservation_datetime = datetime.combine(reservation_date, reservation_time)
         
         # Find suitable tables
         suitable_tables = Table.objects.filter(
@@ -44,15 +47,22 @@ class ReservationViewSet(viewsets.ModelViewSet):
         )
         
         # Check for conflicting reservations (2 hour window)
-        time_window_start = (datetime.combine(reservation_date, reservation_time) - timedelta(hours=1)).time()
-        time_window_end = (datetime.combine(reservation_date, reservation_time) + timedelta(hours=1)).time()
+        # Use datetime for proper time arithmetic that handles midnight crossing
+        time_window_start_dt = reservation_datetime - timedelta(hours=1)
+        time_window_end_dt = reservation_datetime + timedelta(hours=1)
         
         conflicting_reservations = Reservation.objects.filter(
             restaurant_id=restaurant_id,
-            reservation_date=reservation_date,
-            reservation_time__gte=time_window_start,
-            reservation_time__lte=time_window_end,
+            reservation_date__gte=time_window_start_dt.date(),
+            reservation_date__lte=time_window_end_dt.date(),
             status__in=['PENDING', 'CONFIRMED', 'SEATED']
+        ).filter(
+            # Filter by combining date and time properly
+            Q(reservation_date__gt=time_window_start_dt.date()) |
+            Q(reservation_date=time_window_start_dt.date(), reservation_time__gte=time_window_start_dt.time())
+        ).filter(
+            Q(reservation_date__lt=time_window_end_dt.date()) |
+            Q(reservation_date=time_window_end_dt.date(), reservation_time__lte=time_window_end_dt.time())
         ).values_list('table_id', flat=True)
         
         available_tables = suitable_tables.exclude(id__in=conflicting_reservations)
@@ -85,7 +95,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation.save()
         
         # Send confirmation email
-        from .tasks import send_reservation_confirmation
         send_reservation_confirmation.delay(reservation.id)
         
         return Response({'message': 'Reservation confirmed'})

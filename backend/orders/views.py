@@ -6,6 +6,8 @@ from decimal import Decimal
 from .models import Order, OrderItem
 from .serializers import OrderSerializer, OrderItemSerializer
 from .permissions import IsOrderOwnerOrRestaurantOwner, CanModifyOrderStatus
+from .tasks import handle_order_cancellation
+from promotions.models import Promotion
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -21,8 +23,6 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def apply_promo(self, request, pk=None):
         """Apply promo code to order"""
-        from promotions.models import Promotion
-        
         order = self.get_object()
         
         if order.status != 'PENDING':
@@ -78,7 +78,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             discount = promotion.max_discount
         
         # Update order
-        order.discount = Decimal(str(discount))
+        order.discount = discount
         order.total = order.subtotal + order.tax + order.delivery_fee - order.discount
         order.save()
         
@@ -110,7 +110,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         order.save()
         
         # Trigger cancellation tasks
-        from .tasks import handle_order_cancellation
         handle_order_cancellation.delay(order.id)
         
         return Response({'message': 'Order cancelled successfully'})
