@@ -10,3 +10,4 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'role', 'avatar', 
                   'is_staff', 'is_active', 'date_joined', 'created_at']
         read_only_fields = ['id', 'date_joined', 'created_at']
+        ref_name = 'CustomUser'
