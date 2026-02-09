@@ -43,12 +43,14 @@ def send_order_confirmation_email(order_id):
 def send_order_status_update(order_id, new_status):
     """Send email when order status changes"""
     from orders.models import Order
+    from django.conf import settings
     
     try:
         order = Order.objects.get(id=order_id)
     except Order.DoesNotExist:
         return
     
+    # Only send email for certain status changes that customers care about
     status_messages = {
         'CONFIRMED': 'Your order has been confirmed and will be prepared soon.',
         'PREPARING': 'Your order is being prepared.',
@@ -57,7 +59,13 @@ def send_order_status_update(order_id, new_status):
         'DELIVERED': 'Your order has been delivered. Enjoy your meal!',
     }
     
-    message_text = status_messages.get(new_status, f'Your order status: {new_status}')
+    # Skip if status is not in messages (e.g., PENDING, COMPLETED, CANCELLED)
+    if new_status not in status_messages:
+        return
+    
+    message_text = status_messages[new_status]
+    
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
     
     subject = f'Order Update - #{order.order_number}'
     message = f"""
@@ -68,7 +76,7 @@ def send_order_status_update(order_id, new_status):
     Order Number: {order.order_number}
     Restaurant: {order.restaurant.name}
     
-    Track your order: http://localhost:5173/orders/{order.id}
+    Track your order: {frontend_url}/orders/{order.id}
     """
     
     send_mail(
@@ -90,6 +98,8 @@ def notify_restaurant_new_order(order_id):
         order = Order.objects.get(id=order_id)
     except Order.DoesNotExist:
         return
+    
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
     
     # Create notification for restaurant owner
     Notification.objects.create(
@@ -113,7 +123,7 @@ def notify_restaurant_new_order(order_id):
     Items:
     {chr(10).join([f'- {item.menu_item.name} x{item.quantity}' for item in order.items.all()])}
     
-    View order: http://localhost:5173/dashboard/orders/{order.id}
+    View order: {frontend_url}/dashboard/orders/{order.id}
     """
     
     send_mail(

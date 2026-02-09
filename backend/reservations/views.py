@@ -47,25 +47,26 @@ class ReservationViewSet(viewsets.ModelViewSet):
         )
         
         # Check for conflicting reservations (2 hour window)
-        # Use datetime for proper time arithmetic that handles midnight crossing
+        # A reservation conflicts if it's within 2 hours before or after our time
         time_window_start_dt = reservation_datetime - timedelta(hours=1)
         time_window_end_dt = reservation_datetime + timedelta(hours=1)
         
+        # Get all reservations in the date range that could conflict
         conflicting_reservations = Reservation.objects.filter(
             restaurant_id=restaurant_id,
-            reservation_date__gte=time_window_start_dt.date(),
-            reservation_date__lte=time_window_end_dt.date(),
             status__in=['PENDING', 'CONFIRMED', 'SEATED']
-        ).filter(
-            # Filter by combining date and time properly
-            Q(reservation_date__gt=time_window_start_dt.date()) |
-            Q(reservation_date=time_window_start_dt.date(), reservation_time__gte=time_window_start_dt.time())
-        ).filter(
-            Q(reservation_date__lt=time_window_end_dt.date()) |
-            Q(reservation_date=time_window_end_dt.date(), reservation_time__lte=time_window_end_dt.time())
-        ).values_list('table_id', flat=True)
+        )
         
-        available_tables = suitable_tables.exclude(id__in=conflicting_reservations)
+        # Filter for reservations that overlap with our time window
+        # Reservation overlaps if:
+        # (reservation_datetime >= time_window_start) AND (reservation_datetime <= time_window_end)
+        conflicts = []
+        for res in conflicting_reservations:
+            res_datetime = datetime.combine(res.reservation_date, res.reservation_time)
+            if time_window_start_dt <= res_datetime <= time_window_end_dt:
+                conflicts.append(res.table_id)
+        
+        available_tables = suitable_tables.exclude(id__in=conflicts)
         
         if available_tables.exists():
             return Response({

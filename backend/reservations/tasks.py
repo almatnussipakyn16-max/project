@@ -79,27 +79,31 @@ def send_reservation_reminders():
     """Send reminders for upcoming reservations (runs every 30 min)"""
     from reservations.models import Reservation
     from datetime import datetime, timedelta
-    from django.db.models import Q
     
     now = timezone.now()
     reminder_start = now + timedelta(hours=1)
     reminder_end = now + timedelta(hours=1, minutes=30)
     
     # Find reservations in the next hour (between 1 hour and 1.5 hours from now)
-    # Use proper datetime comparison to handle midnight crossing
+    # Get all confirmed reservations and check in Python to handle datetime properly
     upcoming_reservations = Reservation.objects.filter(
-        status='CONFIRMED'
-    ).filter(
-        # Filter for reservations on the start date or later
-        Q(reservation_date__gt=reminder_start.date()) |
-        Q(reservation_date=reminder_start.date(), reservation_time__gte=reminder_start.time())
-    ).filter(
-        # And before the end time
-        Q(reservation_date__lt=reminder_end.date()) |
-        Q(reservation_date=reminder_end.date(), reservation_time__lte=reminder_end.time())
+        status='CONFIRMED',
+        reservation_date__gte=reminder_start.date(),
+        reservation_date__lte=reminder_end.date()
     )
     
+    # Filter in Python for accurate datetime comparison
+    reservations_to_remind = []
     for reservation in upcoming_reservations:
+        res_datetime = datetime.combine(reservation.reservation_date, reservation.reservation_time)
+        # Make timezone-aware if needed
+        if timezone.is_naive(res_datetime):
+            res_datetime = timezone.make_aware(res_datetime)
+        
+        if reminder_start <= res_datetime <= reminder_end:
+            reservations_to_remind.append(reservation)
+    
+    for reservation in reservations_to_remind:
         send_reservation_reminder.delay(reservation.id)
 
 
