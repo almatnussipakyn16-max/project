@@ -355,7 +355,7 @@ INVENTORY_ITEMS_TEMPLATE = [
 SUPPORT_TICKETS_DATA = [
     {
         'subject': 'Order not received',
-        'description': 'I placed an order 2 hours ago but haven\'t received it yet.',
+        'description': 'I placed an order 2 hours ago but haven't received it yet.',
         'status': 'OPEN',
         'priority': 'HIGH',
     },
