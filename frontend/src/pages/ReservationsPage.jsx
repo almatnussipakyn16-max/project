@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { fetchReservations, cancelReservation } from '../store/slices/reservationSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
@@ -18,10 +19,10 @@ const ReservationsPage = () => {
     const result = await dispatch(cancelReservation(id));
     
     if (!result.error) {
-      alert('✅ Reservation cancelled successfully');
+      toast.success('Reservation cancelled successfully');
     } else {
       const errorMessage = result.error?.message || 'Unknown error';
-      alert(`❌ Failed to cancel reservation: ${errorMessage}`);
+      toast.error(`Failed to cancel reservation: ${errorMessage}`);
     }
   };
 

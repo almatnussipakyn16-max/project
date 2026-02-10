@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { fetchOrderById, cancelOrder } from '../store/slices/orderSlice';
 import { addToCart } from '../store/slices/cartSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -45,8 +46,12 @@ const OrderDetailPage = () => {
     setCancelling(true);
     try {
       await dispatch(cancelOrder(id));
-      alert('✅ Order cancelled successfully');
+      toast.success('Order cancelled successfully');
       dispatch(fetchOrderById(id));
+    } catch (error) {
+      const errorMessage = error?.message || 'Failed to cancel order';
+      toast.error(errorMessage);
+      console.error('Order cancellation error:', error);
     } finally {
       setCancelling(false);
     }
@@ -64,10 +69,10 @@ const OrderDetailPage = () => {
           restaurant: order.restaurant,
         }));
       });
-      alert('✅ Items added to cart!');
+      toast.success('Items added to cart!');
       navigate('/cart');
     } catch (error) {
-      alert('❌ ' + error.message);
+      toast.error(error.message);
     }
   };
 

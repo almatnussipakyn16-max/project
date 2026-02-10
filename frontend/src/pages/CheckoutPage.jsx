@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { createOrder } from '../store/slices/orderSlice';
 import { clearCart } from '../store/slices/cartSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -30,7 +31,7 @@ const CheckoutPage = () => {
     e.preventDefault();
 
     if (items.length === 0) {
-      alert('Your cart is empty');
+      toast.error('Your cart is empty');
       navigate('/cart');
       return;
     }
@@ -53,14 +54,14 @@ const CheckoutPage = () => {
       if (!result.error) {
         dispatch(clearCart());
         const orderId = result.payload.id;
-        alert('✅ Order placed successfully!');
+        toast.success('Order placed successfully!');
         navigate(`/orders/${orderId}`);
       } else {
-        alert('❌ Failed to place order: ' + (result.error.message || 'Unknown error'));
+        toast.error('Failed to place order: ' + (result.error.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Order error:', error);
-      alert('❌ Failed to place order');
+      toast.error('Failed to place order');
     }
   };
 
