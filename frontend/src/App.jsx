@@ -11,6 +11,8 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import RestaurantListPage from './pages/RestaurantListPage';
 import RestaurantDetailPage from './pages/client/RestaurantDetailPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -41,6 +43,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/restaurants" element={<RestaurantListPage />} />
           <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
 
           {/* Protected Routes */}
           <Route
@@ -51,8 +54,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Home - redirect to restaurants */}
+          {/* Home */}
           <Route path="/" element={<RestaurantListPage />} />
         </Routes>
       </main>
