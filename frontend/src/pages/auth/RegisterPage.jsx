@@ -36,7 +36,6 @@ const RegisterPage = () => {
     e.preventDefault();
     
     if (formData.password !== formData.password_confirm) {
-      alert('Passwords do not match!');
       return;
     }
 
@@ -79,6 +78,12 @@ const RegisterPage = () => {
                     <div key={key}><strong>{key}:</strong> {Array.isArray(value) ? value.join(', ') : value}</div>
                   ))
                 : error}
+            </div>
+          )}
+
+          {formData.password && formData.password_confirm && formData.password !== formData.password_confirm && (
+            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded text-sm">
+              Passwords do not match!
             </div>
           )}
 
