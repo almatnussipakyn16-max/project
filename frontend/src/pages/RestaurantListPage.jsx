@@ -3,11 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchRestaurants, searchRestaurants } from '../store/slices/restaurantSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { FiStar, FiClock, FiMapPin, FiSearch } from 'react-icons/fi';
+import { motion } from 'framer-motion';
 
 const RestaurantListPage = () => {
   const dispatch = useDispatch();
   const { list: restaurants, loading } = useSelector((state) => state.restaurants);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     dispatch(fetchRestaurants());
@@ -22,139 +25,165 @@ const RestaurantListPage = () => {
     }
   };
 
+  const categories = ['all', 'italian', 'chinese', 'mexican', 'indian', 'american', 'japanese'];
+
+  const filteredRestaurants = restaurants.filter((restaurant) => {
+    const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         restaurant.cuisine_types?.some(ct => ct.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || 
+                           restaurant.cuisine_types?.some(ct => ct.toLowerCase() === selectedCategory);
+    return matchesSearch && matchesCategory;
+  });
+
   return (
-    <div>
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-4">
-            🍽️ Discover Amazing Restaurants
+    <div className="bg-gray-50 min-h-screen py-8">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+            Discover Restaurants
           </h1>
-          <p className="text-xl mb-8 text-orange-100">
-            Order from your favorite local restaurants
-          </p>
-          
-          {/* Search */}
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-            <div className="flex shadow-lg">
+          <p className="text-gray-600">Find your favorite food and order now!</p>
+        </motion.div>
+
+        {/* Search Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6"
+        >
+          <form onSubmit={handleSearch}>
+            <div className="relative">
+              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
               <input
                 type="text"
-                placeholder="Search restaurants, cuisines..."
+                placeholder="Search restaurants or cuisines..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 px-6 py-4 rounded-l-lg text-gray-800 text-lg focus:outline-none"
+                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
               />
-              <button
-                type="submit"
-                className="bg-orange-700 px-8 py-4 rounded-r-lg hover:bg-orange-800 font-semibold transition"
-              >
-                🔍 Search
-              </button>
             </div>
           </form>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Restaurant List */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">All Restaurants</h2>
-          <div className="text-gray-600">
-            {restaurants.length} restaurant{restaurants.length !== 1 ? 's' : ''} found
-          </div>
-        </div>
-        
+        {/* Category Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex gap-3 mb-8 overflow-x-auto pb-2"
+        >
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
+                selectedCategory === category
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
+              }`}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+          ))}
+        </motion.div>
+        {/* Restaurants Grid */}
         {loading ? (
           <LoadingSpinner />
-        ) : restaurants.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {restaurants.map((restaurant) => (
-              <Link
+        ) : filteredRestaurants.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {filteredRestaurants.map((restaurant, index) => (
+              <motion.div
                 key={restaurant.id}
-                to={`/restaurants/${restaurant.id}`}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:-translate-y-1"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
               >
-                {/* Image */}
-                <div className="h-48 bg-gradient-to-br from-orange-200 to-orange-300 relative">
-                  {restaurant.cover_image ? (
-                    <img
-                      src={restaurant.cover_image}
-                      alt={restaurant.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <span className="text-6xl">🍽️</span>
-                    </div>
-                  )}
-                  {restaurant.is_active ? (
-                    <span className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      ✓ Open
-                    </span>
-                  ) : (
-                    <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      ✗ Closed
-                    </span>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="p-4">
-                  <h3 className="text-xl font-bold mb-2 text-gray-900">{restaurant.name}</h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {restaurant.description || 'Delicious food awaits you!'}
-                  </p>
-
-                  {/* Rating and Price */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <span className="text-yellow-500 text-lg">⭐</span>
-                      <span className="ml-1 font-semibold">
-                        {restaurant.rating ? restaurant.rating.toFixed(1) : 'New'}
-                      </span>
-                      <span className="text-gray-500 text-sm ml-1">
-                        ({restaurant.total_reviews || 0})
-                      </span>
-                    </div>
-                    <span className="text-gray-700 font-semibold">
-                      {restaurant.price_range || '$$'}
-                    </span>
-                  </div>
-
-                  {/* Cuisines */}
-                  {restaurant.cuisine_types && restaurant.cuisine_types.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {restaurant.cuisine_types.slice(0, 3).map((cuisine, index) => (
-                        <span
-                          key={index}
-                          className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium"
-                        >
-                          {cuisine}
+                <Link to={`/restaurants/${restaurant.id}`}>
+                  <motion.div
+                    whileHover={{ y: -8, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+                    className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300"
+                  >
+                    {/* Image */}
+                    <div className="h-48 bg-gradient-to-br from-orange-200 to-orange-300 relative overflow-hidden">
+                      {restaurant.cover_image ? (
+                        <img
+                          src={restaurant.cover_image}
+                          alt={restaurant.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-6xl">
+                          🍽️
+                        </div>
+                      )}
+                      {restaurant.is_active ? (
+                        <span className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                          Open Now
                         </span>
-                      ))}
-                      {restaurant.cuisine_types.length > 3 && (
-                        <span className="text-gray-500 text-xs py-1">
-                          +{restaurant.cuisine_types.length - 3} more
+                      ) : (
+                        <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
+                          Closed
                         </span>
                       )}
                     </div>
-                  )}
 
-                  {/* Address */}
-                  {restaurant.address && (
-                    <p className="text-gray-500 text-xs mt-3 truncate">
-                      📍 {restaurant.address}
-                    </p>
-                  )}
-                </div>
-              </Link>
+                    {/* Content */}
+                    <div className="p-5">
+                      <h3 className="text-xl font-bold mb-2 text-gray-900">{restaurant.name}</h3>
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        {restaurant.description || 'Delicious food awaits you!'}
+                      </p>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <FiStar className="text-yellow-500" />
+                          <span className="font-semibold">
+                            {restaurant.rating ? restaurant.rating.toFixed(1) : 'New'}
+                          </span>
+                          <span className="text-gray-400">•</span>
+                          <span className="text-sm">{restaurant.price_range || '$$'}</span>
+                        </div>
+                        {restaurant.cuisine_types && restaurant.cuisine_types.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {restaurant.cuisine_types.slice(0, 3).map((cuisine, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium"
+                              >
+                                {cuisine}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {restaurant.address && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <FiMapPin className="text-red-500" />
+                            <span className="text-sm line-clamp-1">{restaurant.address}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
-          <div className="text-center py-12">
+          <div className="text-center py-16 bg-white rounded-xl">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-2xl font-bold text-gray-700 mb-2">No restaurants found</h3>
-            <p className="text-gray-600">Try adjusting your search query</p>
+            <p className="text-gray-600">Try adjusting your search or filters</p>
           </div>
         )}
       </div>

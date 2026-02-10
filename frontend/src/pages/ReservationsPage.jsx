@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { fetchReservations, cancelReservation } from '../store/slices/reservationSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { FiCalendar, FiClock, FiUsers, FiPhone, FiXCircle, FiCheckCircle } from 'react-icons/fi';
 
 const ReservationsPage = () => {
   const dispatch = useDispatch();
@@ -28,14 +29,14 @@ const ReservationsPage = () => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      PENDING: { text: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: '⏳' },
-      CONFIRMED: { text: 'Confirmed', color: 'bg-green-100 text-green-800', icon: '✅' },
-      CANCELLED: { text: 'Cancelled', color: 'bg-red-100 text-red-800', icon: '❌' },
-      COMPLETED: { text: 'Completed', color: 'bg-gray-100 text-gray-800', icon: '✓' },
+      PENDING: { text: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: <FiClock className="inline" /> },
+      CONFIRMED: { text: 'Confirmed', color: 'bg-green-100 text-green-800', icon: <FiCheckCircle className="inline" /> },
+      CANCELLED: { text: 'Cancelled', color: 'bg-red-100 text-red-800', icon: <FiXCircle className="inline" /> },
+      COMPLETED: { text: 'Completed', color: 'bg-gray-100 text-gray-800', icon: <FiCheckCircle className="inline" /> },
     };
     const badge = badges[status] || badges.PENDING;
     return (
-      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badge.color}`}>
+      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badge.color} inline-flex items-center gap-1`}>
         {badge.icon} {badge.text}
       </span>
     );
@@ -55,7 +56,10 @@ const ReservationsPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">📅 My Reservations</h1>
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+          <FiCalendar className="text-orange-600" />
+          My Reservations
+        </h1>
 
         {/* Filter Tabs */}
         <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
@@ -113,21 +117,24 @@ const ReservationsPage = () => {
                 <div key={reservation.id} className="bg-white rounded-lg shadow p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-bold mb-1">
+                      <h3 className="text-xl font-bold mb-1 flex items-center gap-2">
                         🍽️ {reservation.restaurant?.name || 'Restaurant'}
                       </h3>
                       <p className="text-gray-600">
                         Reservation #{reservation.id}
                       </p>
                     </div>
-                    {getStatusBadge(reservation.status)}
+                    <div className="flex flex-col items-end">
+                      {getStatusBadge(reservation.status)}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                       <div className="text-sm text-gray-600">Date</div>
-                      <div className="font-semibold">
-                        📅 {new Date(reservation.reservation_date).toLocaleDateString('en-US', {
+                      <div className="font-semibold flex items-center gap-2">
+                        <FiCalendar className="text-orange-500" />
+                        {new Date(reservation.reservation_date).toLocaleDateString('en-US', {
                           weekday: 'short',
                           year: 'numeric',
                           month: 'short',
@@ -137,14 +144,16 @@ const ReservationsPage = () => {
                     </div>
                     <div>
                       <div className="text-sm text-gray-600">Time</div>
-                      <div className="font-semibold">
-                        🕐 {reservation.reservation_time}
+                      <div className="font-semibold flex items-center gap-2">
+                        <FiClock className="text-blue-500" />
+                        {reservation.reservation_time}
                       </div>
                     </div>
                     <div>
                       <div className="text-sm text-gray-600">Party Size</div>
-                      <div className="font-semibold">
-                        👥 {reservation.party_size} {reservation.party_size === 1 ? 'person' : 'people'}
+                      <div className="font-semibold flex items-center gap-2">
+                        <FiUsers className="text-green-500" />
+                        {reservation.party_size} {reservation.party_size === 1 ? 'person' : 'people'}
                       </div>
                     </div>
                   </div>
@@ -160,13 +169,15 @@ const ReservationsPage = () => {
                     {canCancel && (
                       <button
                         onClick={() => handleCancel(reservation.id)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold flex items-center gap-2"
                       >
-                        ❌ Cancel
+                        <FiXCircle />
+                        Cancel
                       </button>
                     )}
-                    <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold">
-                      📞 Contact Restaurant
+                    <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold flex items-center gap-2">
+                      <FiPhone />
+                      Contact Restaurant
                     </button>
                   </div>
                 </div>
@@ -175,7 +186,7 @@ const ReservationsPage = () => {
           </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-lg">
-            <div className="text-6xl mb-4">📅</div>
+            <FiCalendar className="text-6xl text-gray-300 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-700 mb-2">No reservations found</h3>
             <p className="text-gray-600 mb-6">
               {filter === 'all' 

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { fetchNotifications, markAsRead, markAllAsRead } from '../store/slices/notificationSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { FiBell, FiPackage, FiCalendar, FiGift, FiSettings, FiCheck } from 'react-icons/fi';
 
 const NotificationsPage = () => {
   const dispatch = useDispatch();
@@ -24,12 +25,12 @@ const NotificationsPage = () => {
 
   const getTypeIcon = (type) => {
     const icons = {
-      ORDER_UPDATE: '📦',
-      RESERVATION_UPDATE: '📅',
-      PROMOTION: '🎉',
-      SYSTEM: '⚙️',
+      ORDER_UPDATE: <FiPackage className="text-orange-500" />,
+      RESERVATION_UPDATE: <FiCalendar className="text-blue-500" />,
+      PROMOTION: <FiGift className="text-purple-500" />,
+      SYSTEM: <FiSettings className="text-gray-500" />,
     };
-    return icons[type] || '📢';
+    return icons[type] || <FiBell className="text-gray-500" />;
   };
 
   const filteredNotifications = notifications.filter((notification) => {
@@ -47,7 +48,10 @@ const NotificationsPage = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">🔔 Notifications</h1>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              <FiBell className="text-orange-600" />
+              Notifications
+            </h1>
             {unreadCount > 0 && (
               <p className="text-gray-600 mt-1">{unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}</p>
             )}
@@ -55,9 +59,10 @@ const NotificationsPage = () => {
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllAsRead}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold"
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold flex items-center gap-2"
             >
-              ✓ Mark All as Read
+              <FiCheck />
+              Mark All as Read
             </button>
           )}
         </div>
@@ -92,7 +97,8 @@ const NotificationsPage = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            📦 Orders
+            <FiPackage className="inline mr-2" />
+            Orders
           </button>
           <button
             onClick={() => setFilter('reservations')}
@@ -102,7 +108,8 @@ const NotificationsPage = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            📅 Reservations
+            <FiCalendar className="inline mr-2" />
+            Reservations
           </button>
         </div>
 
@@ -131,8 +138,9 @@ const NotificationsPage = () => {
                       {notification.message}
                     </p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>
-                        🕐 {new Date(notification.created_at).toLocaleString()}
+                      <span className="flex items-center gap-1">
+                        <FiBell className="inline" />
+                        {new Date(notification.created_at).toLocaleString()}
                       </span>
                       {!notification.is_read && (
                         <button
@@ -154,7 +162,7 @@ const NotificationsPage = () => {
           </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-lg">
-            <div className="text-6xl mb-4">🔔</div>
+            <FiBell className="text-6xl text-gray-300 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-700 mb-2">
               {filter === 'all' ? 'No notifications yet' : `No ${filter} notifications`}
             </h3>
