@@ -37,6 +37,18 @@ export const checkAvailability = createAsyncThunk(
   }
 );
 
+export const cancelReservation = createAsyncThunk(
+  'reservations/cancel',
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await reservationService.cancel(id);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 const reservationSlice = createSlice({
   name: 'reservations',
   initialState: {
@@ -83,6 +95,22 @@ const reservationSlice = createSlice({
         state.availability = action.payload;
       })
       .addCase(checkAvailability.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(cancelReservation.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(cancelReservation.fulfilled, (state, action) => {
+        state.loading = false;
+        state.current = action.payload;
+        // Update the reservation in the list to reflect cancellation
+        const index = state.list.findIndex(r => r.id === action.payload.id);
+        if (index !== -1) {
+          state.list[index] = action.payload;
+        }
+      })
+      .addCase(cancelReservation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

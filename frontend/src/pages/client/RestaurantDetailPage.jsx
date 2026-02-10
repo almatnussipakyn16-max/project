@@ -5,6 +5,7 @@ import { fetchRestaurantById } from '../../store/slices/restaurantSlice';
 import { menuService } from '../../services';
 import { addToCart } from '../../store/slices/cartSlice';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ReservationForm from '../../components/reservations/ReservationForm';
 
 const RestaurantDetailPage = () => {
   const { id } = useParams();
@@ -230,6 +231,13 @@ const RestaurantDetailPage = () => {
             )}
           </>
         )}
+      </div>
+
+      {/* Reservation Section */}
+      <div className="container mx-auto px-4 pb-12">
+        <div className="max-w-2xl mx-auto">
+          <ReservationForm restaurantId={restaurant.id} restaurantName={restaurant.name} />
+        </div>
       </div>
     </div>
   );
