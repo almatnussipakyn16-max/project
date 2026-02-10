@@ -5,8 +5,10 @@ import { fetchCurrentUser } from './store/slices/authSlice';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const dispatch = useDispatch();
@@ -36,6 +38,16 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
+          {/* Protected Routes */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Home */}
           <Route
             path="/"
@@ -48,8 +60,8 @@ function App() {
                 <div className="text-gray-500 text-sm space-y-1">
                   <p>✅ PR #3: Services & Redux - Done</p>
                   <p>✅ PR #4: Navbar & Footer - Done</p>
-                  <p>✅ PR #5: Login & Register - Current</p>
-                  <p>⏳ PR #6: Profile - Coming soon</p>
+                  <p>✅ PR #5: Login & Register - Done</p>
+                  <p>✅ PR #6: Profile Page - Current</p>
                   <p>⏳ PR #7: Restaurants - Coming soon</p>
                 </div>
                 {isAuthenticated && user && (
