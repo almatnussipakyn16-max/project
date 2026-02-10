@@ -25,7 +25,7 @@ const OrdersPage = () => {
     };
     const badge = badges[status] || badges.PENDING;
     return (
-      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badge.color} flex items-center gap-1`}>
+      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badge.color} inline-flex items-center gap-1`}>
         {badge.icon} {badge.text}
       </span>
     );
