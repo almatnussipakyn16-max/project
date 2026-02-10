@@ -19,7 +19,7 @@ const ReservationsPage = () => {
       await dispatch(cancelReservation(id));
       alert('✅ Reservation cancelled successfully');
       dispatch(fetchReservations());
-    } catch (error) {
+    } catch {
       alert('❌ Failed to cancel reservation');
     }
   };
@@ -105,7 +105,6 @@ const ReservationsPage = () => {
         ) : filteredReservations.length > 0 ? (
           <div className="space-y-4">
             {filteredReservations.map((reservation) => {
-              const reservationDate = new Date(reservation.reservation_date + 'T' + reservation.reservation_time);
               const canCancel = reservation.status === 'PENDING' || reservation.status === 'CONFIRMED';
               
               return (
