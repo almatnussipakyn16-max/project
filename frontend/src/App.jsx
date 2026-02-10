@@ -11,15 +11,15 @@ import RegisterPage from './pages/auth/RegisterPage';
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const [initialLoading, setInitialLoading] = React.useState(true);
+  const [initialLoading, setInitialLoading] = React.useState(() => {
+    return isAuthenticated && !user;
+  });
 
   useEffect(() => {
     if (isAuthenticated && !user) {
       dispatch(fetchCurrentUser()).finally(() => {
         setInitialLoading(false);
       });
-    } else {
-      setInitialLoading(false);
     }
   }, [dispatch, isAuthenticated, user]);
 
