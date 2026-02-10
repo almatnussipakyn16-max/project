@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { fetchNotifications, markAsRead, markAllAsRead } from '../store/slices/notificationSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
@@ -18,7 +19,7 @@ const NotificationsPage = () => {
 
   const handleMarkAllAsRead = async () => {
     await dispatch(markAllAsRead());
-    alert('✅ All notifications marked as read');
+    toast.success('All notifications marked as read');
   };
 
   const getTypeIcon = (type) => {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { createReservation } from '../../store/slices/reservationSlice';
 
 const ReservationForm = ({ restaurantId, restaurantName }) => {
@@ -38,14 +39,14 @@ const ReservationForm = ({ restaurantId, restaurantName }) => {
       const result = await dispatch(createReservation(reservationData));
       
       if (!result.error) {
-        alert('✅ Reservation created successfully!');
+        toast.success('Reservation created successfully!');
         navigate('/reservations');
       } else {
-        alert('❌ Failed to create reservation: ' + (result.error.message || 'Unknown error'));
+        toast.error('Failed to create reservation: ' + (result.error.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Reservation error:', error);
-      alert('❌ Failed to create reservation');
+      toast.error('Failed to create reservation');
     } finally {
       setLoading(false);
     }
