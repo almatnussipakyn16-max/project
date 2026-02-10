@@ -28,7 +28,6 @@ const CartPage = () => {
   const handleQuantityChange = (itemId, newQuantity) => {
     if (newQuantity > 0) {
       dispatch(updateQuantity({ itemId, quantity: newQuantity }));
-      toast.success('Quantity updated');
     }
   };
 
@@ -82,7 +81,8 @@ const CartPage = () => {
           toast.error('Invalid promo code');
         }
       }
-    } catch {
+    } catch (error) {
+      console.error('Promo validation error:', error);
       setPromoError('Invalid promo code');
       toast.error('Invalid promo code');
     } finally {

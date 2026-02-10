@@ -36,6 +36,11 @@ const CheckoutPage = () => {
     }
   }, [items.length, navigate]);
 
+  // Early return if no restaurant (safety check)
+  if (!restaurant) {
+    return null;
+  }
+
   const steps = [
     { number: 1, title: 'Delivery', icon: FiMapPin },
     { number: 2, title: 'Payment', icon: FiCreditCard },
