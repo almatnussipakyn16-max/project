@@ -61,6 +61,18 @@ export const trackOrder = createAsyncThunk(
   }
 );
 
+export const cancelOrder = createAsyncThunk(
+  'orders/cancel',
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const data = await orderService.cancelOrder(orderId);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 const orderSlice = createSlice({
   name: 'orders',
   initialState: {
@@ -129,6 +141,17 @@ const orderSlice = createSlice({
         state.tracking = action.payload;
       })
       .addCase(trackOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(cancelOrder.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(cancelOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.current = action.payload;
+      })
+      .addCase(cancelOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
