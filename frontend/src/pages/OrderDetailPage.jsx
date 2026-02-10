@@ -35,6 +35,10 @@ const OrderDetailPage = () => {
     return steps[status] || 0;
   };
 
+  const isStepCompleted = (currentStatus, requiredStatuses) => {
+    return requiredStatuses.includes(currentStatus);
+  };
+
   const handleCancelOrder = async () => {
     if (!window.confirm('Are you sure you want to cancel this order?')) return;
     
@@ -115,8 +119,8 @@ const OrderDetailPage = () => {
 
                 {/* Status Timeline */}
                 <div className="space-y-4">
-                  <div className={`flex items-start ${order.status === 'PENDING' || ['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'text-orange-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${order.status === 'PENDING' || ['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
+                  <div className={`flex items-start ${isStepCompleted(order.status, ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? 'text-orange-600' : 'text-gray-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isStepCompleted(order.status, ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
                       ✓
                     </div>
                     <div className="ml-4 flex-1">
@@ -127,9 +131,9 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
 
-                  <div className={`flex items-start ${['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'text-orange-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
-                      {['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? '✓' : '○'}
+                  <div className={`flex items-start ${isStepCompleted(order.status, ['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? 'text-orange-600' : 'text-gray-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isStepCompleted(order.status, ['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
+                      {isStepCompleted(order.status, ['CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? '✓' : '○'}
                     </div>
                     <div className="ml-4 flex-1">
                       <div className="font-semibold">Order Confirmed</div>
@@ -137,9 +141,9 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
 
-                  <div className={`flex items-start ${['PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'text-orange-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${['PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
-                      {['PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? '✓' : '○'}
+                  <div className={`flex items-start ${isStepCompleted(order.status, ['PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? 'text-orange-600' : 'text-gray-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isStepCompleted(order.status, ['PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
+                      {isStepCompleted(order.status, ['PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED']) ? '✓' : '○'}
                     </div>
                     <div className="ml-4 flex-1">
                       <div className="font-semibold">Preparing Food</div>
@@ -147,9 +151,9 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
 
-                  <div className={`flex items-start ${['OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'text-orange-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${['OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
-                      {['OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.status) ? '✓' : '○'}
+                  <div className={`flex items-start ${isStepCompleted(order.status, ['OUT_FOR_DELIVERY', 'DELIVERED']) ? 'text-orange-600' : 'text-gray-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isStepCompleted(order.status, ['OUT_FOR_DELIVERY', 'DELIVERED']) ? 'bg-orange-600 text-white' : 'bg-gray-200'}`}>
+                      {isStepCompleted(order.status, ['OUT_FOR_DELIVERY', 'DELIVERED']) ? '✓' : '○'}
                     </div>
                     <div className="ml-4 flex-1">
                       <div className="font-semibold">Out for Delivery</div>
@@ -157,9 +161,9 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
 
-                  <div className={`flex items-start ${order.status === 'DELIVERED' ? 'text-green-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${order.status === 'DELIVERED' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
-                      {order.status === 'DELIVERED' ? '✓' : '○'}
+                  <div className={`flex items-start ${isStepCompleted(order.status, ['DELIVERED']) ? 'text-green-600' : 'text-gray-400'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isStepCompleted(order.status, ['DELIVERED']) ? 'bg-green-600 text-white' : 'bg-gray-200'}`}>
+                      {isStepCompleted(order.status, ['DELIVERED']) ? '✓' : '○'}
                     </div>
                     <div className="ml-4 flex-1">
                       <div className="font-semibold">Delivered</div>

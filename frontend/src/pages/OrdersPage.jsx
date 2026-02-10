@@ -30,6 +30,11 @@ const OrdersPage = () => {
     );
   };
 
+  // Compute counts once
+  const activeOrders = orders.filter(o => ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY'].includes(o.status));
+  const completedOrders = orders.filter(o => o.status === 'DELIVERED');
+  const cancelledOrders = orders.filter(o => o.status === 'CANCELLED');
+
   const filteredOrders = orders.filter((order) => {
     if (filter === 'all') return true;
     if (filter === 'active') return ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY'].includes(order.status);
@@ -63,7 +68,7 @@ const OrdersPage = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            Active ({orders.filter(o => ['PENDING', 'CONFIRMED', 'PREPARING', 'OUT_FOR_DELIVERY'].includes(o.status)).length})
+            Active ({activeOrders.length})
           </button>
           <button
             onClick={() => setFilter('completed')}
@@ -73,7 +78,7 @@ const OrdersPage = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            Completed ({orders.filter(o => o.status === 'DELIVERED').length})
+            Completed ({completedOrders.length})
           </button>
           <button
             onClick={() => setFilter('cancelled')}
@@ -83,7 +88,7 @@ const OrdersPage = () => {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            Cancelled ({orders.filter(o => o.status === 'CANCELLED').length})
+            Cancelled ({cancelledOrders.length})
           </button>
         </div>
 
