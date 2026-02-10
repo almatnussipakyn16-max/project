@@ -1,75 +1,137 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../../store/slices/authSlice';
-import { toast } from 'react-toastify';
+import { Link, useNavigate } from 'react-router-dom';
+import { login, clearError } from '../../store/slices/authSlice';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+  
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+    return () => {
+      dispatch(clearError());
+    };
+  }, [isAuthenticated, navigate, dispatch]);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await dispatch(login({ email, password })).unwrap();
-      toast.success('Login successful!');
-      navigate('/');
-    } catch (err) {
-      toast.error(err?.detail || 'Login failed');
-    }
+    dispatch(login(formData));
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-center mb-8">Login</h2>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            🍽️ Sign in to your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Or{' '}
+            <Link to="/register" className="font-medium text-orange-600 hover:text-orange-500">
+              create a new account
+            </Link>
+          </p>
+        </div>
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {typeof error === 'object' 
+                ? Object.values(error).flat().join(', ')
+                : 'Invalid email or password'}
+            </div>
+          )}
+
+          <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email address
               </label>
               <input
+                id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                autoComplete="email"
                 required
+                value={formData.email}
+                onChange={handleChange}
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                placeholder="Enter your email"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
               <input
+                id="password"
+                name="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                autoComplete="current-password"
                 required
+                value={formData.password}
+                onChange={handleChange}
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                placeholder="Enter your password"
               />
             </div>
-            
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                Remember me
+              </label>
+            </div>
+
+            <div className="text-sm">
+              <Link to="/forgot-password" className="font-medium text-orange-600 hover:text-orange-500">
+                Forgot password?
+              </Link>
+            </div>
+          </div>
+
+          <div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
-          </form>
-          
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
-              Sign up
-            </Link>
-          </p>
+          </div>
+        </form>
+
+        <div className="text-center">
+          <div className="text-sm text-gray-600 mb-2">Test accounts:</div>
+          <div className="bg-gray-100 rounded-lg p-3 text-xs space-y-1">
+            <p><strong>Customer:</strong> customer1@example.com / testpass123</p>
+            <p><strong>Owner:</strong> owner1@example.com / testpass123</p>
+            <p><strong>Admin:</strong> admin@example.com / testpass123</p>
+          </div>
         </div>
       </div>
     </div>
