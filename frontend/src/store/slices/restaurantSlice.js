@@ -25,6 +25,18 @@ export const fetchRestaurantById = createAsyncThunk(
   }
 );
 
+export const searchRestaurants = createAsyncThunk(
+  'restaurants/search',
+  async (query, { rejectWithValue }) => {
+    try {
+      const data = await restaurantService.search(query);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 const restaurantSlice = createSlice({
   name: 'restaurants',
   initialState: {
@@ -33,7 +45,11 @@ const restaurantSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearCurrent: (state) => {
+      state.current = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchRestaurants.pending, (state) => {
@@ -47,10 +63,31 @@ const restaurantSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchRestaurantById.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchRestaurantById.fulfilled, (state, action) => {
+        state.loading = false;
         state.current = action.payload;
+      })
+      .addCase(fetchRestaurantById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(searchRestaurants.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchRestaurants.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload.results || action.payload;
+      })
+      .addCase(searchRestaurants.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
+
+export const { clearCurrent } = restaurantSlice.actions;
 
 export default restaurantSlice.reducer;
