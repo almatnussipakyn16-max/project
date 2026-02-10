@@ -75,7 +75,7 @@ const notificationSlice = createSlice({
       })
       .addCase(markAsRead.fulfilled, (state, action) => {
         state.loading = false;
-        const notification = state.list.find(n => n.id === action.payload);
+        const notification = state.list.find(notification => notification.id === action.payload);
         if (notification) {
           notification.is_read = true;
           state.unreadCount = Math.max(0, state.unreadCount - 1);
