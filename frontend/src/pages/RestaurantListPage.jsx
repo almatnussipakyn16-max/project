@@ -1,53 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { fetchRestaurants, searchRestaurants } from '../store/slices/restaurantSlice';
+import { fetchRestaurants } from '../store/slices/restaurantSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { FiStar, FiClock, FiMapPin, FiSearch } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import RestaurantCard from '../components/restaurants/RestaurantCard';
+import { FiSearch, FiFilter } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const RestaurantListPage = () => {
   const dispatch = useDispatch();
   const { list: restaurants, loading } = useSelector((state) => state.restaurants);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('featured'); // featured, rating, delivery_time
 
   useEffect(() => {
     dispatch(fetchRestaurants());
   }, [dispatch]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      dispatch(searchRestaurants(searchQuery));
-    } else {
-      dispatch(fetchRestaurants());
-    }
-  };
+  const categories = ['all', 'italian', 'chinese', 'mexican', 'indian', 'american', 'japanese', 'fast food'];
 
-  const categories = ['all', 'italian', 'chinese', 'mexican', 'indian', 'american', 'japanese'];
-
-  const filteredRestaurants = restaurants.filter((restaurant) => {
-    const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         restaurant.cuisine_types?.some(ct => ct.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || 
-                           restaurant.cuisine_types?.some(ct => ct.toLowerCase() === selectedCategory);
-    return matchesSearch && matchesCategory;
-  });
+  const filteredRestaurants = restaurants
+    .filter((restaurant) => {
+      const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           restaurant.cuisine_types?.some(ct => ct.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           restaurant.cuisine_type?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || 
+                             restaurant.cuisine_types?.some(ct => ct.toLowerCase() === selectedCategory) ||
+                             restaurant.cuisine_type?.toLowerCase() === selectedCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+      if (sortBy === 'delivery_time') return (parseInt(a.delivery_time) || 30) - (parseInt(b.delivery_time) || 30);
+      if (sortBy === 'featured') return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      return 0;
+    });
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
+    <div className="bg-gradient-to-br from-gray-50 to-orange-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-8 text-center"
         >
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
             Discover Restaurants
           </h1>
-          <p className="text-gray-600">Find your favorite food and order now!</p>
+          <p className="text-gray-600 text-lg">Find your favorite food and order now!</p>
         </motion.div>
 
         {/* Search Bar */}
@@ -55,43 +56,75 @@ const RestaurantListPage = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-6"
+          className="mb-6 max-w-2xl mx-auto"
         >
-          <form onSubmit={handleSearch}>
-            <div className="relative">
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
-              <input
-                type="text"
-                placeholder="Search restaurants or cuisines..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
-              />
-            </div>
-          </form>
+          <div className="relative">
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+            <input
+              type="text"
+              placeholder="Search restaurants or cuisines..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm hover:shadow-md transition-all"
+            />
+          </div>
         </motion.div>
 
-        {/* Category Filters */}
+        {/* Filters Row */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex gap-3 mb-8 overflow-x-auto pb-2"
+          className="mb-6"
         >
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
-                selectedCategory === category
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
-              }`}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 text-gray-700">
+              <FiFilter />
+              <span className="font-medium">Filters</span>
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
             >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
+              <option value="featured">Featured</option>
+              <option value="rating">Highest Rated</option>
+              <option value="delivery_time">Fastest Delivery</option>
+            </select>
+          </div>
+
+          {/* Category Filters */}
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {categories.map((category) => (
+              <motion.button
+                key={category}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-6 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
+                  selectedCategory === category
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
+                }`}
+              >
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </motion.button>
+            ))}
+          </div>
         </motion.div>
+
+        {/* Results Count */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mb-4"
+        >
+          <p className="text-gray-600">
+            Found <span className="font-bold text-orange-600">{filteredRestaurants.length}</span> restaurant{filteredRestaurants.length !== 1 ? 's' : ''}
+          </p>
+        </motion.div>
+
         {/* Restaurants Grid */}
         {loading ? (
           <LoadingSpinner />
@@ -99,94 +132,50 @@ const RestaurantListPage = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredRestaurants.map((restaurant, index) => (
-              <motion.div
-                key={restaurant.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link to={`/restaurants/${restaurant.id}`}>
-                  <motion.div
-                    whileHover={{ y: -8, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
-                    className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300"
-                  >
-                    {/* Image */}
-                    <div className="h-48 bg-gradient-to-br from-orange-200 to-orange-300 relative overflow-hidden">
-                      {restaurant.cover_image ? (
-                        <img
-                          src={restaurant.cover_image}
-                          alt={restaurant.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-6xl">
-                          🍽️
-                        </div>
-                      )}
-                      {restaurant.is_active ? (
-                        <span className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                          Open Now
-                        </span>
-                      ) : (
-                        <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                          Closed
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-5">
-                      <h3 className="text-xl font-bold mb-2 text-gray-900">{restaurant.name}</h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                        {restaurant.description || 'Delicious food awaits you!'}
-                      </p>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <FiStar className="text-yellow-500" />
-                          <span className="font-semibold">
-                            {restaurant.rating ? restaurant.rating.toFixed(1) : 'New'}
-                          </span>
-                          <span className="text-gray-400">•</span>
-                          <span className="text-sm">{restaurant.price_range || '$$'}</span>
-                        </div>
-                        {restaurant.cuisine_types && restaurant.cuisine_types.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {restaurant.cuisine_types.slice(0, 3).map((cuisine, idx) => (
-                              <span
-                                key={idx}
-                                className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-medium"
-                              >
-                                {cuisine}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {restaurant.address && (
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <FiMapPin className="text-red-500" />
-                            <span className="text-sm line-clamp-1">{restaurant.address}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                </Link>
-              </motion.div>
-            ))}
+            <AnimatePresence>
+              {filteredRestaurants.map((restaurant, index) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  index={index}
+                />
+              ))}
+            </AnimatePresence>
           </motion.div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-xl">
-            <div className="text-6xl mb-4">🔍</div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16 bg-white rounded-2xl shadow-md"
+          >
+            <div className="text-7xl mb-4">🔍</div>
             <h3 className="text-2xl font-bold text-gray-700 mb-2">No restaurants found</h3>
-            <p className="text-gray-600">Try adjusting your search or filters</p>
-          </div>
+            <p className="text-gray-600 mb-6">Try adjusting your search or filters</p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('all');
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition"
+            >
+              Clear Filters
+            </button>
+          </motion.div>
         )}
       </div>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };
