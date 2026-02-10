@@ -44,7 +44,8 @@ const ProfilePage = () => {
       setIsEditing(false);
       alert('✅ Profile updated successfully!');
     } catch (error) {
-      alert('❌ Failed to update profile');
+      const errorMessage = error.response?.data?.detail || error.message || 'Unknown error occurred';
+      alert(`❌ Failed to update profile: ${errorMessage}`);
       console.error(error);
     } finally {
       setIsSaving(false);
