@@ -15,12 +15,13 @@ const ReservationsPage = () => {
   const handleCancel = async (id) => {
     if (!window.confirm('Are you sure you want to cancel this reservation?')) return;
     
-    try {
-      await dispatch(cancelReservation(id));
+    const result = await dispatch(cancelReservation(id));
+    
+    if (!result.error) {
       alert('✅ Reservation cancelled successfully');
-      dispatch(fetchReservations());
-    } catch {
-      alert('❌ Failed to cancel reservation');
+    } else {
+      const errorMessage = result.error?.message || 'Unknown error';
+      alert(`❌ Failed to cancel reservation: ${errorMessage}`);
     }
   };
 

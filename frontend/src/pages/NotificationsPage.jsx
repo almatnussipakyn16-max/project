@@ -14,12 +14,10 @@ const NotificationsPage = () => {
 
   const handleMarkAsRead = async (id) => {
     await dispatch(markAsRead(id));
-    dispatch(fetchNotifications());
   };
 
   const handleMarkAllAsRead = async () => {
     await dispatch(markAllAsRead());
-    dispatch(fetchNotifications());
     alert('✅ All notifications marked as read');
   };
 

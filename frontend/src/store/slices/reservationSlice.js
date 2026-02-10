@@ -104,6 +104,11 @@ const reservationSlice = createSlice({
       .addCase(cancelReservation.fulfilled, (state, action) => {
         state.loading = false;
         state.current = action.payload;
+        // Update the reservation in the list to reflect cancellation
+        const index = state.list.findIndex(r => r.id === action.payload.id);
+        if (index !== -1) {
+          state.list[index] = action.payload;
+        }
       })
       .addCase(cancelReservation.rejected, (state, action) => {
         state.loading = false;
