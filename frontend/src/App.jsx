@@ -15,6 +15,8 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
+import ReservationsPage from './pages/ReservationsPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -77,6 +79,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <OrderDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reservations"
+            element={
+              <ProtectedRoute>
+                <ReservationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />
