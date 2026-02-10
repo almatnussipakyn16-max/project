@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 const RestaurantListPage = () => {
   const dispatch = useDispatch();
   const { list: restaurants, loading } = useSelector((state) => state.restaurants);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
@@ -18,8 +18,8 @@ const RestaurantListPage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      dispatch(searchRestaurants(searchTerm));
+    if (searchQuery.trim()) {
+      dispatch(searchRestaurants(searchQuery));
     } else {
       dispatch(fetchRestaurants());
     }
@@ -28,8 +28,8 @@ const RestaurantListPage = () => {
   const categories = ['all', 'italian', 'chinese', 'mexican', 'indian', 'american', 'japanese'];
 
   const filteredRestaurants = restaurants.filter((restaurant) => {
-    const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.cuisine_types?.some(ct => ct.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         restaurant.cuisine_types?.some(ct => ct.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || 
                            restaurant.cuisine_types?.some(ct => ct.toLowerCase() === selectedCategory);
     return matchesSearch && matchesCategory;
@@ -63,8 +63,8 @@ const RestaurantListPage = () => {
               <input
                 type="text"
                 placeholder="Search restaurants or cuisines..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm"
               />
             </div>
