@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchOrders } from '../store/slices/orderSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { FiPackage, FiClock, FiCheckCircle, FiXCircle, FiTruck, FiChefHat } from 'react-icons/fi';
+import { FiPackage, FiClock, FiCheckCircle, FiXCircle, FiTruck } from 'react-icons/fi';
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const OrdersPage = () => {
     const badges = {
       PENDING: { text: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: <FiClock className="inline" /> },
       CONFIRMED: { text: 'Confirmed', color: 'bg-blue-100 text-blue-800', icon: <FiCheckCircle className="inline" /> },
-      PREPARING: { text: 'Preparing', color: 'bg-purple-100 text-purple-800', icon: <FiChefHat className="inline" /> },
+      PREPARING: { text: 'Preparing', color: 'bg-purple-100 text-purple-800', icon: <FiPackage className="inline" /> },
       OUT_FOR_DELIVERY: { text: 'Out for Delivery', color: 'bg-orange-100 text-orange-800', icon: <FiTruck className="inline" /> },
       DELIVERED: { text: 'Delivered', color: 'bg-green-100 text-green-800', icon: <FiCheckCircle className="inline" /> },
       CANCELLED: { text: 'Cancelled', color: 'bg-red-100 text-red-800', icon: <FiXCircle className="inline" /> },
