@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { fetchRestaurantById } from '../../store/slices/restaurantSlice';
 import { menuService } from '../../services';
 import { addToCart } from '../../store/slices/cartSlice';
@@ -47,9 +48,9 @@ const RestaurantDetailPage = () => {
           name: restaurant.name,
         },
       }));
-      alert('✅ Added to cart!');
+      toast.success('Added to cart!');
     } catch (error) {
-      alert('❌ ' + error.message);
+      toast.error(error.message);
     }
   };
 

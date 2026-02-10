@@ -1,27 +1,32 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 
-const LoadingSpinner = ({ size = 'md', fullScreen = false }) => {
-  const sizeClasses = {
-    sm: 'h-6 w-6',
-    md: 'h-12 w-12',
-    lg: 'h-16 w-16',
+const LoadingSpinner = ({ fullScreen = false }) => {
+  const spinnerVariants = {
+    animate: {
+      rotate: 360,
+      transition: {
+        duration: 1,
+        repeat: Infinity,
+        ease: 'linear',
+      },
+    },
   };
 
-  const spinner = (
-    <div className="flex justify-center items-center">
-      <div className={`animate-spin rounded-full border-b-2 border-orange-600 ${sizeClasses[size]}`}></div>
+  const containerClass = fullScreen
+    ? 'fixed inset-0 flex items-center justify-center bg-white bg-opacity-90 z-50'
+    : 'flex items-center justify-center py-12';
+
+  return (
+    <div className={containerClass}>
+      <motion.div
+        className="w-12 h-12 border-4 border-orange-200 border-t-orange-600 rounded-full"
+        variants={spinnerVariants}
+        animate="animate"
+      />
     </div>
   );
-
-  if (fullScreen) {
-    return (
-      <div className="fixed inset-0 bg-white bg-opacity-80 flex justify-center items-center z-50">
-        {spinner}
-      </div>
-    );
-  }
-
-  return <div className="py-12">{spinner}</div>;
 };
 
 export default LoadingSpinner;

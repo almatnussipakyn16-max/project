@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { login, clearError } from '../../store/slices/authSlice';
 
 const LoginPage = () => {
@@ -15,6 +16,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      toast.success('Welcome back!');
       navigate('/');
     }
     return () => {
@@ -31,7 +33,10 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(login(formData));
+    const result = await dispatch(login(formData));
+    if (result.error) {
+      toast.error('Invalid credentials');
+    }
   };
 
   return (

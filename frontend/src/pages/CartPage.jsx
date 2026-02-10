@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { updateQuantity, removeFromCart, applyDiscount } from '../store/slices/cartSlice';
 import { promotionService } from '../services';
 
@@ -40,7 +41,7 @@ const CartPage = () => {
       if (result.valid) {
         const discountAmount = result.discount_amount || 0;
         dispatch(applyDiscount(discountAmount));
-        alert(`✅ Promo code applied! You saved $${discountAmount.toFixed(2)}`);
+        toast.success(`Promo code applied! You saved $${discountAmount.toFixed(2)}`);
       } else {
         setPromoError(result.message || 'Invalid promo code');
       }
@@ -53,7 +54,7 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-      alert('Please login to proceed with checkout');
+      toast.error('Please login to proceed with checkout');
       navigate('/login');
       return;
     }
