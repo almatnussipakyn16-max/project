@@ -9,6 +9,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
+import RestaurantListPage from './pages/RestaurantListPage';
+import RestaurantDetailPage from './pages/client/RestaurantDetailPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -34,9 +36,11 @@ function App() {
       <Navbar />
       <main className="flex-grow">
         <Routes>
-          {/* Auth Routes */}
+          {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/restaurants" element={<RestaurantListPage />} />
+          <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />
 
           {/* Protected Routes */}
           <Route
@@ -48,30 +52,8 @@ function App() {
             }
           />
 
-          {/* Home */}
-          <Route
-            path="/"
-            element={
-              <div className="container mx-auto px-4 py-12 text-center">
-                <h1 className="text-4xl font-bold mb-4">🍽️ Welcome to FoodDelivery</h1>
-                <p className="text-gray-600 mb-8">
-                  Your favorite restaurants, delivered to your door.
-                </p>
-                <div className="text-gray-500 text-sm space-y-1">
-                  <p>✅ PR #3: Services & Redux - Done</p>
-                  <p>✅ PR #4: Navbar & Footer - Done</p>
-                  <p>✅ PR #5: Login & Register - Done</p>
-                  <p>✅ PR #6: Profile Page - Current</p>
-                  <p>⏳ PR #7: Restaurants - Coming soon</p>
-                </div>
-                {isAuthenticated && user && (
-                  <div className="mt-8 bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded inline-block">
-                    ✅ Logged in as: <strong>{user.first_name} {user.last_name}</strong> ({user.email})
-                  </div>
-                )}
-              </div>
-            }
-          />
+          {/* Home - redirect to restaurants */}
+          <Route path="/" element={<RestaurantListPage />} />
         </Routes>
       </main>
       <Footer />
