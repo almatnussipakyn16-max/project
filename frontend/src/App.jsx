@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchCurrentUser } from './store/slices/authSlice';
+import Navbar from './components/common/Navbar';
+import Footer from './components/common/Footer';
+import LoadingSpinner from './components/common/LoadingSpinner';
 
 // Pages
 import HomePage from './pages/client/HomePage';
@@ -10,21 +15,40 @@ import RegisterPage from './pages/auth/RegisterPage';
 import RestaurantDetailPage from './pages/client/RestaurantDetailPage';
 import AdminDashboard from './pages/admin/Dashboard';
 
-// Layout
-import MainLayout from './components/layout/MainLayout';
-
 function App() {
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const [initialLoading, setInitialLoading] = React.useState(() => {
+    return isAuthenticated && !user;
+  });
+
+  useEffect(() => {
+    if (isAuthenticated && !user) {
+      dispatch(fetchCurrentUser()).finally(() => {
+        setInitialLoading(false);
+      });
+    }
+  }, [dispatch, isAuthenticated, user]);
+
+  if (initialLoading) {
+    return <LoadingSpinner fullScreen />;
+  }
+
   return (
     <>
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />
-          <Route path="/admin/*" element={<AdminDashboard />} />
-        </Routes>
-      </MainLayout>
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />
+            <Route path="/admin/*" element={<AdminDashboard />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
       <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
