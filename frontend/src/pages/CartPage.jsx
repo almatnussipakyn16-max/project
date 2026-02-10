@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { updateQuantity, removeFromCart, applyDiscount } from '../store/slices/cartSlice';
 import { promotionService } from '../services';
+import { FiShoppingCart, FiTrash2, FiMinus, FiPlus, FiTag } from 'react-icons/fi';
+import { motion } from 'framer-motion';
 
 const CartPage = () => {
   const dispatch = useDispatch();
@@ -65,7 +67,7 @@ const CartPage = () => {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
-          <div className="text-8xl mb-6">🛒</div>
+          <FiShoppingCart className="text-8xl text-gray-300 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4">Your cart is empty</h2>
           <p className="text-gray-600 mb-8">
             Add some delicious items to your cart to get started!
@@ -84,7 +86,10 @@ const CartPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">🛒 Shopping Cart</h1>
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+          <FiShoppingCart className="text-orange-600" />
+          Shopping Cart
+        </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
@@ -128,16 +133,16 @@ const CartPage = () => {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                            className="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 transition font-bold"
+                            className="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 transition font-bold flex items-center justify-center"
                           >
-                            −
+                            <FiMinus />
                           </button>
                           <span className="font-semibold w-8 text-center">{item.quantity}</span>
                           <button
                             onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                            className="w-8 h-8 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition font-bold"
+                            className="w-8 h-8 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition font-bold flex items-center justify-center"
                           >
-                            +
+                            <FiPlus />
                           </button>
                         </div>
 
@@ -159,7 +164,7 @@ const CartPage = () => {
                       className="text-red-500 hover:text-red-700 transition self-start"
                       title="Remove item"
                     >
-                      <span className="text-2xl">🗑️</span>
+                      <FiTrash2 className="text-2xl" />
                     </button>
                   </div>
                 </div>
@@ -174,7 +179,8 @@ const CartPage = () => {
 
               {/* Promo Code */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <FiTag className="text-orange-500" />
                   Promo Code
                 </label>
                 <div className="flex gap-2">
@@ -197,8 +203,9 @@ const CartPage = () => {
                   <p className="text-red-500 text-sm mt-1">{promoError}</p>
                 )}
                 {discount > 0 && (
-                  <p className="text-green-600 text-sm mt-1">
-                    ✅ Discount applied!
+                  <p className="text-green-600 text-sm mt-1 flex items-center gap-1">
+                    <FiTag />
+                    Discount applied!
                   </p>
                 )}
               </div>
@@ -241,8 +248,9 @@ const CartPage = () => {
 
               {/* Free Delivery Notice */}
               {subtotal < 30 && (
-                <p className="text-sm text-gray-600 mt-4 text-center">
-                  💡 Add ${(30 - subtotal).toFixed(2)} more for FREE delivery!
+                <p className="text-sm text-gray-600 mt-4 text-center flex items-center justify-center gap-2">
+                  <FiTag className="text-orange-500" />
+                  Add ${(30 - subtotal).toFixed(2)} more for FREE delivery!
                 </p>
               )}
             </div>

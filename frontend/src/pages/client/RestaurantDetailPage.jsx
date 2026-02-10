@@ -7,6 +7,8 @@ import { menuService } from '../../services';
 import { addToCart } from '../../store/slices/cartSlice';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ReservationForm from '../../components/reservations/ReservationForm';
+import { FiStar, FiClock, FiMapPin, FiPhone, FiMail, FiPlus } from 'react-icons/fi';
+import { BiDollar } from 'react-icons/bi';
 
 const RestaurantDetailPage = () => {
   const { id } = useParams();
@@ -99,7 +101,7 @@ const RestaurantDetailPage = () => {
               {/* Rating */}
               <div className="flex items-center gap-6 mb-4">
                 <div className="flex items-center">
-                  <span className="text-yellow-500 text-2xl">⭐</span>
+                  <FiStar className="text-yellow-500 text-2xl" />
                   <span className="ml-2 text-xl font-semibold">
                     {restaurant.rating ? restaurant.rating.toFixed(1) : 'New'}
                   </span>
@@ -128,9 +130,20 @@ const RestaurantDetailPage = () => {
 
               {/* Contact */}
               <div className="space-y-1 text-gray-700">
-                <p>📍 {restaurant.address}</p>
-                <p>📞 {restaurant.phone}</p>
-                {restaurant.email && <p>📧 {restaurant.email}</p>}
+                <p className="flex items-center gap-2">
+                  <FiMapPin className="text-red-500" />
+                  {restaurant.address}
+                </p>
+                <p className="flex items-center gap-2">
+                  <FiPhone className="text-blue-500" />
+                  {restaurant.phone}
+                </p>
+                {restaurant.email && (
+                  <p className="flex items-center gap-2">
+                    <FiMail className="text-green-500" />
+                    {restaurant.email}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -210,13 +223,20 @@ const RestaurantDetailPage = () => {
                         <button
                           onClick={() => handleAddToCart(item)}
                           disabled={!item.is_available}
-                          className={`px-6 py-2 rounded-lg font-semibold transition ${
+                          className={`px-6 py-2 rounded-lg font-semibold transition flex items-center gap-2 ${
                             item.is_available
                               ? 'bg-orange-600 text-white hover:bg-orange-700'
                               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           }`}
                         >
-                          {item.is_available ? '+ Add' : 'Unavailable'}
+                          {item.is_available ? (
+                            <>
+                              <FiPlus />
+                              Add
+                            </>
+                          ) : (
+                            'Unavailable'
+                          )}
                         </button>
                       </div>
                     </div>
