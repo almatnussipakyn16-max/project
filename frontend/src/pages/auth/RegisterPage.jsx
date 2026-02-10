@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { register, clearError } from '../../store/slices/authSlice';
 
 const RegisterPage = () => {
@@ -43,9 +44,12 @@ const RegisterPage = () => {
     
     if (!result.error) {
       setSuccess(true);
+      toast.success('Account created successfully!');
       setTimeout(() => {
         navigate('/login');
       }, 2000);
+    } else {
+      toast.error('Registration failed');
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { fetchCurrentUser } from '../store/slices/authSlice';
 import { authService } from '../services';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -42,10 +43,10 @@ const ProfilePage = () => {
       await authService.updateProfile(formData);
       await dispatch(fetchCurrentUser());
       setIsEditing(false);
-      alert('✅ Profile updated successfully!');
+      toast.success('Profile updated successfully!');
     } catch (error) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error occurred';
-      alert(`❌ Failed to update profile: ${errorMessage}`);
+      toast.error(`Failed to update profile: ${errorMessage}`);
       console.error(error);
     } finally {
       setIsSaving(false);
