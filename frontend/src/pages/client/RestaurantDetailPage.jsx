@@ -26,7 +26,7 @@ const RestaurantDetailPage = () => {
       setCategories(categoriesData.results || categoriesData);
       setMenuItems(itemsData.results || itemsData);
     } catch (error) {
-      console.error('Failed to load menu:', error);
+      console.error(`Failed to load menu for restaurant ${id}:`, error.message || error);
     } finally {
       setLoadingMenu(false);
     }
