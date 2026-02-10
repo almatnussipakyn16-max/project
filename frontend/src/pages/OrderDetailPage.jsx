@@ -48,8 +48,10 @@ const OrderDetailPage = () => {
       await dispatch(cancelOrder(id));
       toast.success('Order cancelled successfully');
       dispatch(fetchOrderById(id));
-    } catch {
-      toast.error('Failed to cancel order');
+    } catch (error) {
+      const errorMessage = error?.message || 'Failed to cancel order';
+      toast.error(errorMessage);
+      console.error('Order cancellation error:', error);
     } finally {
       setCancelling(false);
     }
