@@ -63,12 +63,27 @@ const restaurantSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchRestaurantById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchRestaurantById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.current = action.payload;
+      })
       .addCase(fetchRestaurantById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(searchRestaurants.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(searchRestaurants.fulfilled, (state, action) => {
+        state.loading = false;
         state.list = action.payload.results || action.payload;
+      })
+      .addCase(searchRestaurants.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

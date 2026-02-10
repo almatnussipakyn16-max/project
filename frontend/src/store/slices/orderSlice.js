@@ -88,8 +88,16 @@ const orderSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchOrderById.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchOrderById.fulfilled, (state, action) => {
+        state.loading = false;
         state.current = action.payload;
+      })
+      .addCase(fetchOrderById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
@@ -102,11 +110,27 @@ const orderSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(applyPromoCode.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(applyPromoCode.fulfilled, (state, action) => {
+        state.loading = false;
         state.current = action.payload;
       })
+      .addCase(applyPromoCode.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(trackOrder.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(trackOrder.fulfilled, (state, action) => {
+        state.loading = false;
         state.tracking = action.payload;
+      })
+      .addCase(trackOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

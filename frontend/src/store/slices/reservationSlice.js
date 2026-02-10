@@ -75,8 +75,16 @@ const reservationSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(checkAvailability.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(checkAvailability.fulfilled, (state, action) => {
+        state.loading = false;
         state.availability = action.payload;
+      })
+      .addCase(checkAvailability.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

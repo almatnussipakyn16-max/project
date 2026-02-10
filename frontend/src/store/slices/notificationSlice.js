@@ -48,18 +48,42 @@ const notificationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchNotifications.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
+        state.loading = false;
         state.list = action.payload.results || action.payload;
       })
+      .addCase(fetchNotifications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchUnreadCount.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchUnreadCount.fulfilled, (state, action) => {
+        state.loading = false;
         state.unreadCount = action.payload;
       })
+      .addCase(fetchUnreadCount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(markAsRead.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(markAsRead.fulfilled, (state, action) => {
+        state.loading = false;
         const notification = state.list.find(n => n.id === action.payload);
         if (notification) {
           notification.is_read = true;
+          state.unreadCount = Math.max(0, state.unreadCount - 1);
         }
-        state.unreadCount = Math.max(0, state.unreadCount - 1);
+      })
+      .addCase(markAsRead.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
