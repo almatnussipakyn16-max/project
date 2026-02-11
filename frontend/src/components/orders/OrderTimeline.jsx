@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiPackage, FiTruck, FiClock } from 'react-icons/fi';
 
-const OrderTimeline = ({ order }) => {
+const OrderTimeline = React.memo(({ order }) => {
   const steps = [
     {
       key: 'placed',
@@ -112,6 +112,6 @@ const OrderTimeline = ({ order }) => {
       })}
     </div>
   );
-};
+});
 
 export default OrderTimeline;
