@@ -52,7 +52,6 @@ export const MenuItemCard: FC<MenuItemCardProps> = ({ item, onAddToCart }) => {
           <Button
             onClick={() => onAddToCart(item)}
             disabled={!item.is_available}
-            size="sm"
           >
             {item.is_available ? TEXTS.addToCart : 'Недоступно'}
           </Button>
