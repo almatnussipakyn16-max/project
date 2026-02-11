@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { fetchNotifications, markAsRead, markAllAsRead } from '../store/slices/notificationSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import PageTransition from '../components/common/PageTransition';
 import { FiBell, FiPackage, FiCalendar, FiGift, FiSettings, FiCheck } from 'react-icons/fi';
 
 const NotificationsPage = () => {
@@ -44,6 +45,7 @@ const NotificationsPage = () => {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
+    <PageTransition>
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
@@ -175,6 +177,7 @@ const NotificationsPage = () => {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 };
 

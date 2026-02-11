@@ -81,12 +81,18 @@ const Navbar = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 className="text-gray-700 hover:text-orange-600 transition"
+                aria-label="Shopping cart"
               >
                 <FiShoppingCart className="text-2xl" />
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    key={cartItemCount}
+                    className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                  >
                     {cartItemCount}
-                  </span>
+                  </motion.span>
                 )}
               </motion.button>
             </Link>
@@ -99,12 +105,17 @@ const Navbar = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className="text-gray-700 hover:text-orange-600 transition"
+                    aria-label="Notifications"
                   >
                     <FiBell className="text-2xl" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse"
+                      >
                         {unreadCount}
-                      </span>
+                      </motion.span>
                     )}
                   </motion.button>
                 </Link>
@@ -116,6 +127,7 @@ const Navbar = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                     className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition"
+                    aria-label="User profile"
                   >
                     <FiUser className="text-2xl" />
                     <span className="hidden md:block font-medium">{user?.first_name || user?.username || 'Account'}</span>

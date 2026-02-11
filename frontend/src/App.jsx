@@ -6,6 +6,7 @@ import { fetchCurrentUser } from './store/slices/authSlice';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ScrollToTop from './components/common/ScrollToTop';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -66,6 +67,8 @@ function App() {
           },
         }}
       />
+
+      <ScrollToTop />
 
       <div className="flex flex-col min-h-screen">
         <Navbar />

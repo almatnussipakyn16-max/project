@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { fetchReservations, cancelReservation } from '../store/slices/reservationSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import PageTransition from '../components/common/PageTransition';
 import { FiCalendar, FiClock, FiUsers, FiPhone, FiXCircle, FiCheckCircle } from 'react-icons/fi';
 
 const ReservationsPage = () => {
@@ -54,6 +55,7 @@ const ReservationsPage = () => {
   });
 
   return (
+    <PageTransition>
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
@@ -197,6 +199,7 @@ const ReservationsPage = () => {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 };
 
