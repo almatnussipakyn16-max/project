@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiStar, FiClock, FiMapPin, FiDollarSign } from 'react-icons/fi';
 
-const RestaurantCard = ({ restaurant, index = 0 }) => {
+const RestaurantCard = React.memo(({ restaurant, index = 0 }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,6 +22,7 @@ const RestaurantCard = ({ restaurant, index = 0 }) => {
                 transition={{ duration: 0.3 }}
                 src={restaurant.image || restaurant.cover_image}
                 alt={restaurant.name}
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -109,6 +110,6 @@ const RestaurantCard = ({ restaurant, index = 0 }) => {
       </Link>
     </motion.div>
   );
-};
+});
 
 export default RestaurantCard;

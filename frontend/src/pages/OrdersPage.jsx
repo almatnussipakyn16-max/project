@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fetchOrders } from '../store/slices/orderSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import PageTransition from '../components/common/PageTransition';
+import { SkeletonOrderCard } from '../components/common/SkeletonLoader';
 import StatusBadge from '../components/common/StatusBadge';
 import { FiPackage, FiClock, FiShoppingBag } from 'react-icons/fi';
 
@@ -32,7 +34,8 @@ const OrdersPage = () => {
   const filteredOrders = getFilteredOrders(filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-8">
+    <PageTransition>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}
         <motion.div
@@ -76,7 +79,11 @@ const OrdersPage = () => {
 
         {/* Orders List */}
         {loading ? (
-          <LoadingSpinner />
+          <div className="space-y-4">
+            {[...Array(4)].map((_, index) => (
+              <SkeletonOrderCard key={index} />
+            ))}
+          </div>
         ) : filteredOrders.length > 0 ? (
           <div className="space-y-4">
             {filteredOrders.map((order, index) => (
@@ -174,6 +181,7 @@ const OrdersPage = () => {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 };
 

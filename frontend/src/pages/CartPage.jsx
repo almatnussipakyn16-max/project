@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { updateQuantity, removeFromCart, clearCart, applyDiscount } from '../store/slices/cartSlice';
 import { promotionService } from '../services';
+import PageTransition from '../components/common/PageTransition';
 import { FiShoppingCart, FiTrash2, FiMinus, FiPlus, FiTag, FiArrowRight, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -107,7 +108,8 @@ const CartPage = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 flex items-center justify-center py-16">
+      <PageTransition>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 flex items-center justify-center py-16">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -129,11 +131,13 @@ const CartPage = () => {
           </motion.div>
         </div>
       </div>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 py-8">
+    <PageTransition>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 py-8">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -355,6 +359,7 @@ const CartPage = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

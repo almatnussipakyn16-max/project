@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfettiExplosion from 'react-confetti-explosion';
+import PageTransition from '../components/common/PageTransition';
 import { createOrder } from '../store/slices/orderSlice';
 import { clearCart } from '../store/slices/cartSlice';
 import {
@@ -22,6 +24,7 @@ const CheckoutPage = () => {
   const { loading } = useSelector((state) => state.orders);
 
   const [step, setStep] = useState(1);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [formData, setFormData] = useState({
     delivery_address: user?.address || '',
     delivery_instructions: '',
@@ -99,10 +102,13 @@ const CheckoutPage = () => {
       const result = await dispatch(createOrder(orderData));
       
       if (!result.error) {
-        dispatch(clearCart());
-        const orderId = result.payload.id;
-        toast.success('🎉 Order placed successfully!');
-        navigate(`/orders/${orderId}`);
+        setShowConfetti(true);
+        setTimeout(() => {
+          dispatch(clearCart());
+          const orderId = result.payload.id;
+          toast.success('🎉 Order placed successfully!');
+          navigate(`/orders/${orderId}`);
+        }, 1500); // Wait for confetti
       } else {
         toast.error('Failed to place order: ' + (result.error.message || 'Unknown error'));
       }
@@ -117,7 +123,18 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 py-8">
+    <PageTransition>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50 py-8">
+      {showConfetti && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <ConfettiExplosion
+            force={0.8}
+            duration={3000}
+            particleCount={200}
+            width={1600}
+          />
+        </div>
+      )}
       <div className="container mx-auto px-4">
         <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
           <FiShoppingBag className="text-orange-600" />
@@ -461,6 +478,7 @@ const CheckoutPage = () => {
         </form>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

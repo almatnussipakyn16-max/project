@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchRestaurants } from '../store/slices/restaurantSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import RestaurantCard from '../components/restaurants/RestaurantCard';
+import PageTransition from '../components/common/PageTransition';
+import { SkeletonRestaurantCard } from '../components/common/SkeletonLoader';
 import { FiSearch, FiFilter } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -37,7 +39,8 @@ const RestaurantListPage = () => {
     });
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-orange-50 min-h-screen py-8">
+    <PageTransition>
+      <div className="bg-gradient-to-br from-gray-50 to-orange-50 min-h-screen py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -127,7 +130,11 @@ const RestaurantListPage = () => {
 
         {/* Restaurants Grid */}
         {loading ? (
-          <LoadingSpinner />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <SkeletonRestaurantCard key={index} />
+            ))}
+          </div>
         ) : filteredRestaurants.length > 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -177,6 +184,7 @@ const RestaurantListPage = () => {
         }
       `}</style>
     </div>
+    </PageTransition>
   );
 };
 

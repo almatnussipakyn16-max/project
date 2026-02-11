@@ -8,6 +8,7 @@ import { fetchOrders } from '../store/slices/orderSlice';
 import { authService } from '../services';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import StatusBadge from '../components/common/StatusBadge';
+import PageTransition from '../components/common/PageTransition';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiSave, FiX, FiPackage, FiDollarSign, FiCalendar, FiStar } from 'react-icons/fi';
 
 const ProfilePage = () => {
@@ -97,6 +98,7 @@ const ProfilePage = () => {
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -394,6 +396,7 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

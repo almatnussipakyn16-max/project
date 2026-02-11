@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LoadingSpinner = ({ size = 'md', fullScreen = false }) => {
+const LoadingSpinner = React.memo(({ size = 'md', fullScreen = false }) => {
   const sizeClasses = {
     sm: 'h-6 w-6',
     md: 'h-12 w-12',
@@ -22,6 +22,6 @@ const LoadingSpinner = ({ size = 'md', fullScreen = false }) => {
   }
 
   return <div className="py-12">{spinner}</div>;
-};
+});
 
 export default LoadingSpinner;

@@ -8,6 +8,7 @@ import { addToCart } from '../store/slices/cartSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import StatusBadge from '../components/common/StatusBadge';
 import OrderTimeline from '../components/orders/OrderTimeline';
+import PageTransition from '../components/common/PageTransition';
 import { FiArrowLeft, FiMapPin, FiCreditCard, FiRefreshCw, FiXCircle, FiDollarSign } from 'react-icons/fi';
 
 const OrderDetailPage = () => {
@@ -76,6 +77,7 @@ const OrderDetailPage = () => {
   const canCancel = ['PENDING', 'CONFIRMED'].includes(order.status);
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}
@@ -269,6 +271,7 @@ const OrderDetailPage = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

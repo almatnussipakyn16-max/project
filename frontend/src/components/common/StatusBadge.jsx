@@ -2,7 +2,7 @@ import React from 'react';
 import { FiClock, FiCheckCircle, FiPackage, FiTruck, FiXCircle } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
-const StatusBadge = ({ status, showIcon = true, size = 'md' }) => {
+const StatusBadge = React.memo(({ status, showIcon = true, size = 'md' }) => {
   const config = {
     PENDING: {
       icon: FiClock,
@@ -59,6 +59,6 @@ const StatusBadge = ({ status, showIcon = true, size = 'md' }) => {
       <span>{statusData.label}</span>
     </motion.div>
   );
-};
+});
 
 export default StatusBadge;

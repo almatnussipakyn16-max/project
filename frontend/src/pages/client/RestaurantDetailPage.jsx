@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchRestaurantById } from '../../store/slices/restaurantSlice';
 import { addToCart } from '../../store/slices/cartSlice';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import PageTransition from '../../components/common/PageTransition';
+import { SkeletonMenuItem } from '../../components/common/SkeletonLoader';
 import ReservationForm from '../../components/reservations/ReservationForm';
 import { FiStar, FiClock, FiMapPin, FiPhone, FiShoppingCart, FiPlus } from 'react-icons/fi';
 import { BiDollar } from 'react-icons/bi';
@@ -63,7 +65,8 @@ const RestaurantDetailPage = () => {
   ].filter(Boolean);
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <PageTransition>
+      <div className="bg-gray-50 min-h-screen">
       {/* Image Gallery */}
       <div className="relative h-96 bg-gray-900">
         {galleryImages.length > 1 ? (
@@ -81,6 +84,7 @@ const RestaurantDetailPage = () => {
                   <img
                     src={image}
                     alt={`${restaurant.name} ${index + 1}`}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/20" />
@@ -94,6 +98,7 @@ const RestaurantDetailPage = () => {
               <img
                 src={restaurant.image || restaurant.cover_image}
                 alt={restaurant.name}
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -206,7 +211,13 @@ const RestaurantDetailPage = () => {
 
               {/* Menu Items */}
               <div className="space-y-4">
-                {filteredMenuItems.length > 0 ? (
+                {loading ? (
+                  <>
+                    {[...Array(5)].map((_, index) => (
+                      <SkeletonMenuItem key={index} />
+                    ))}
+                  </>
+                ) : filteredMenuItems.length > 0 ? (
                   filteredMenuItems.map((item, index) => (
                     <motion.div
                       key={item.id}
@@ -221,6 +232,7 @@ const RestaurantDetailPage = () => {
                           <img
                             src={item.image}
                             alt={item.name}
+                            loading="lazy"
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -292,6 +304,7 @@ const RestaurantDetailPage = () => {
         }
       `}</style>
     </div>
+    </PageTransition>
   );
 };
 
