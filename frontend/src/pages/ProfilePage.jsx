@@ -87,10 +87,14 @@ const ProfilePage = () => {
       restaurantCounts[restId] = (restaurantCounts[restId] || 0) + 1;
     }
   });
-  const favoriteRestaurantId = Object.keys(restaurantCounts).reduce((a, b) => 
-    restaurantCounts[a] > restaurantCounts[b] ? a : b, null
-  );
-  const favoriteRestaurant = orders.find(o => o.restaurant?.id === parseInt(favoriteRestaurantId))?.restaurant;
+  
+  let favoriteRestaurant = null;
+  if (Object.keys(restaurantCounts).length > 0) {
+    const favoriteRestaurantId = Object.keys(restaurantCounts).reduce((a, b) => 
+      restaurantCounts[a] > restaurantCounts[b] ? a : b
+    );
+    favoriteRestaurant = orders.find(o => o.restaurant?.id === parseInt(favoriteRestaurantId))?.restaurant;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-8">
@@ -175,10 +179,13 @@ const ProfilePage = () => {
                   <FiCalendar className="text-blue-600 mx-auto" />
                 </div>
                 <div className="text-sm font-bold text-gray-900">
-                  {new Date(user.created_at || Date.now()).toLocaleDateString('en-US', { 
-                    month: 'short', 
-                    year: 'numeric' 
-                  })}
+                  {user.created_at 
+                    ? new Date(user.created_at).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        year: 'numeric' 
+                      })
+                    : 'N/A'
+                  }
                 </div>
                 <div className="text-sm text-gray-600">Member Since</div>
               </div>
