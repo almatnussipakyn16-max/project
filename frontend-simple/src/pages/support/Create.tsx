@@ -7,6 +7,7 @@ import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { TEXTS } from '../../utils/constants';
 import type { TicketPriority } from '../../api/types';
+import Create from '../reservations/Create';
 
 const CATEGORIES = [
   'Заказ',
@@ -154,3 +155,4 @@ export const CreateTicket: FC = () => {
     </div>
   );
 };
+export default Create;

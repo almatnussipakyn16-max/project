@@ -102,3 +102,4 @@ export const Login: FC = () => {
     </div>
   );
 };
+export default Login;

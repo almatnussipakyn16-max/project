@@ -27,7 +27,7 @@ export const RestaurantCard: FC<RestaurantCardProps> = ({ restaurant }) => {
 
           <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
             <span className="flex items-center gap-1">
-              ⭐ {restaurant.rating.toFixed(1)}
+              <span>⭐ {Number(restaurant.rating).toFixed(1)}</span>
             </span>
             <span>•</span>
             <span>
@@ -62,3 +62,4 @@ export const RestaurantCard: FC<RestaurantCardProps> = ({ restaurant }) => {
     </Link>
   );
 };
+export default RestaurantCard;

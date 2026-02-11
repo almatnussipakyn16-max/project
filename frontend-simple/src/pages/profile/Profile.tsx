@@ -94,3 +94,4 @@ export const Profile: FC = () => {
     </div>
   );
 };
+export default Profile;

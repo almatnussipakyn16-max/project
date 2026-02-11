@@ -83,7 +83,7 @@ export const RestaurantDetail: FC = () => {
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <div className="flex items-center gap-1">
               <span>⭐</span>
-              <span className="font-semibold">{restaurant.rating.toFixed(1)}</span>
+              <span className="font-semibold">{Number(restaurant.data?.rating || 0).toFixed(1)}</span>
               <span className="text-gray-600">({restaurant.total_reviews} {TEXTS.reviews})</span>
             </div>
             
@@ -135,3 +135,4 @@ export const RestaurantDetail: FC = () => {
     </div>
   );
 };
+export default RestaurantDetail;

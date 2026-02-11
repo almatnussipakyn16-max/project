@@ -73,3 +73,4 @@ export const Tickets: FC = () => {
     </div>
   );
 };
+export default Tickets;

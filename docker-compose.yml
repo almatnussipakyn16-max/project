@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:16
     environment:
       POSTGRES_DB: restaurant_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: postgres123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -18,7 +16,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7.1-alpine
+    image: redis:7-alpine
     ports:
       - "6379:6379"
     healthcheck:
@@ -81,20 +79,21 @@ services:
       - DB_HOST=db
       - REDIS_HOST=redis
 
-  frontend:
+  # ✅ НОВЫЙ ФРОНТЕНД
+  frontend-simple:
     build:
-      context: ./frontend
+      context: ./frontend-simple           # ← Изменено
       dockerfile: Dockerfile
     command: npm run dev -- --host
     volumes:
-      - ./frontend:/app
+      - ./frontend-simple:/app             # ← Изменено
       - /app/node_modules
     ports:
-      - "5173:5173"
+      - "5173:5174"
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8000/api  # ← Добавлено /api
 
 volumes:
   postgres_data:

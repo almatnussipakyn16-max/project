@@ -81,3 +81,4 @@ export const Header: FC = () => {
     </header>
   );
 };
+export default Header;

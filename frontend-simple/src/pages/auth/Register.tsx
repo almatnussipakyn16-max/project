@@ -155,3 +155,4 @@ export const Register: FC = () => {
     </div>
   );
 };
+export default Register;
