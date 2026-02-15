@@ -116,7 +116,7 @@ export const useCartStore = create<CartStore>()(
       version: 1, // ✅ Версия для миграции
       
       // ✅ Миграция старых данных
-      migrate: (persistedState: any) => {
+      migrate: (persistedState: any, _version: number) => {
         const state = persistedState as any;
         
         // Если нет items или пустой массив - вернуть как есть
