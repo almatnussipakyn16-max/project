@@ -62,18 +62,6 @@ const SupportTickets: FC = () => {
     return texts[priority] || priority;
   };
 
-  const getCategoryText = (category: string) => {
-    const texts: Record<string, string> = {
-      'GENERAL': 'Общий вопрос',
-      'TECHNICAL': 'Техническая проблема',
-      'BILLING': 'Вопрос по оплате',
-      'ACCOUNT': 'Проблема с аккаунтом',
-      'ORDER': 'Вопрос по заказу',
-      'RESERVATION': 'Вопрос по бронированию',
-    };
-    return texts[category] || category;
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -131,7 +119,6 @@ const SupportTickets: FC = () => {
 
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <div className="flex items-center gap-4">
-                  <span>📁 {getCategoryText(ticket.category)}</span>
                   <span>📅 {formatDate(ticket.created_at)}</span>
                 </div>
                 <Link

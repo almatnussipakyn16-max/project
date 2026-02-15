@@ -40,8 +40,8 @@ const Promotions: FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {promotions.map((promo: Promotion) => {
-              const isActive = new Date(promo.start_date) <= new Date() && 
-                             new Date(promo.end_date) >= new Date() &&
+              const isActive = new Date(promo.valid_from) <= new Date() && 
+                             new Date(promo.valid_until) >= new Date() &&
                              promo.is_active;
               
               const discountText = 
@@ -58,7 +58,7 @@ const Promotions: FC = () => {
                     !isActive ? 'opacity-60' : ''
                   }`}
                 >
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-6">
+                    <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-6">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-3xl font-bold">{discountText}</span>
                       {!isActive && (
@@ -67,12 +67,10 @@ const Promotions: FC = () => {
                         </span>
                       )}
                     </div>
-                    <h3 className="text-xl font-bold">{promo.name}</h3>
+                    <h3 className="text-xl font-bold">{promo.description}</h3>
                   </div>
 
                   <div className="p-6">
-                    <p className="text-gray-700 mb-4">{promo.description}</p>
-
                     {/* Промокод */}
                     <div className="bg-gray-100 rounded-lg p-4 mb-4">
                       <p className="text-sm text-gray-600 mb-1">Промокод:</p>
@@ -94,40 +92,26 @@ const Promotions: FC = () => {
 
                     {/* Детали */}
                     <div className="space-y-2 text-sm text-gray-600">
-                      {promo.minimum_order_amount > 0 && (
-                        <p>📦 Минимальный заказ: {promo.minimum_order_amount} ₸</p>
+                      {promo.min_order_amount && Number(promo.min_order_amount) > 0 && (
+                        <p>📦 Минимальный заказ: {promo.min_order_amount} ₸</p>
                       )}
-                      {promo.max_discount && (
-                        <p>💰 Макс. скидка: {promo.max_discount} ₸</p>
+                      {promo.max_discount_amount && (
+                        <p>💰 Макс. скидка: {promo.max_discount_amount} ₸</p>
                       )}
-                      {promo.max_uses && (
+                      {promo.usage_limit && (
                         <p>
-                          👥 Использовано: {promo.current_uses} / {promo.max_uses}
-                        </p>
-                      )}
-                      {promo.max_uses_per_user && (
-                        <p>
-                          👤 Макс. использований на пользователя: {promo.max_uses_per_user}
+                          👥 Использовано: {promo.used_count} / {promo.usage_limit}
                         </p>
                       )}
                       <p>
                         📅 Действует с:{' '}
-                        {new Date(promo.start_date).toLocaleDateString('ru-RU')}
+                        {new Date(promo.valid_from).toLocaleDateString('ru-RU')}
                       </p>
                       <p>
                         📅 Действует до:{' '}
-                        {new Date(promo.end_date).toLocaleDateString('ru-RU')}
+                        {new Date(promo.valid_until).toLocaleDateString('ru-RU')}
                       </p>
                     </div>
-
-                    {/* Ресторан */}
-                    {promo.restaurant && (
-                      <div className="mt-4 pt-4 border-t">
-                        <p className="text-sm text-gray-600">
-                          Ресторан: <span className="font-medium">{promo.restaurant.name}</span>
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
               );

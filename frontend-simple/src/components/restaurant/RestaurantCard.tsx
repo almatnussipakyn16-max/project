@@ -12,9 +12,9 @@ export const RestaurantCard: FC<RestaurantCardProps> = ({ restaurant }) => {
   return (
     <Link to={`/restaurants/${restaurant.id}`}>
       <Card hover className="h-full">
-        {restaurant.image && (
+        {restaurant.cover_image && (
           <img
-            src={restaurant.image}
+            src={restaurant.cover_image}
             alt={restaurant.name}
             className="w-full h-48 object-cover"
           />

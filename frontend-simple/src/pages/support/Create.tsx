@@ -9,7 +9,6 @@ const SupportCreate: FC = () => {
   
   const [formData, setFormData] = useState<CreateTicketRequest>({
     subject: '',
-    category: 'GENERAL',
     priority: 'MEDIUM',
     description: '',
   });
@@ -72,26 +71,6 @@ const SupportCreate: FC = () => {
               />
             </div>
 
-            {/* Категория */}
-            <div className="mb-6">
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Категория
-              </label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-              >
-                <option value="GENERAL">Общий вопрос</option>
-                <option value="TECHNICAL">Техническая проблема</option>
-                <option value="BILLING">Вопрос по оплате</option>
-                <option value="ACCOUNT">Проблема с аккаунтом</option>
-                <option value="ORDER">Вопрос по заказу</option>
-                <option value="RESERVATION">Вопрос по бронированию</option>
-              </select>
-            </div>
 
             {/* Приоритет */}
             <div className="mb-6">

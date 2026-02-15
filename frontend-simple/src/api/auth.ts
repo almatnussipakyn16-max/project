@@ -21,8 +21,8 @@ export const authApi = {
   },
 
   // Обновить профиль
-  updateProfile: async (userId: number, updates: Partial<User>): Promise<User> => {
-    const { data } = await api.patch<User>(`/auth/users/${userId}/`, updates);
+  updateProfile: async (updates: Partial<User>): Promise<User> => {
+    const { data } = await api.patch<User>('/auth/users/me/', updates);
     return data;
   },
 

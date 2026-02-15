@@ -12,7 +12,7 @@ const RestaurantList: FC = () => {
     queryKey: ['restaurants', searchQuery, cuisineFilter],
     queryFn: () => restaurantsApi.getAll({ 
       search: searchQuery || undefined,
-      cuisine_type: cuisineFilter || undefined,
+      cuisine_types: cuisineFilter || undefined,
     }),
   });
 
@@ -34,7 +34,7 @@ const RestaurantList: FC = () => {
     );
   }
 
-  const restaurants = data?.data?.results || data?.data || [];
+  const restaurants = data?.results || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
