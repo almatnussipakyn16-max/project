@@ -10,7 +10,8 @@ interface CartItemProps {
 
 export const CartItem: FC<CartItemProps> = ({ item, onUpdateQuantity, onRemove }) => {
   const { menuItem, quantity } = item;
-  const itemTotal = parseFloat(menuItem.price) * quantity;
+  const price = typeof menuItem.price === 'number' ? menuItem.price : parseFloat(String(menuItem.price));
+  const itemTotal = price * quantity;
 
   return (
     <div className="flex items-center gap-4 py-4 border-b">
@@ -24,12 +25,7 @@ export const CartItem: FC<CartItemProps> = ({ item, onUpdateQuantity, onRemove }
 
       <div className="flex-1">
         <h4 className="font-semibold">{menuItem.name}</h4>
-        <p className="text-sm text-gray-600">{formatPrice(menuItem.price)}</p>
-        {item.specialInstructions && (
-          <p className="text-xs text-gray-500 mt-1">
-            Примечание: {item.specialInstructions}
-          </p>
-        )}
+        <p className="text-sm text-gray-600">{formatPrice(price)}</p>
       </div>
 
       <div className="flex items-center gap-3">

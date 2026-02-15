@@ -24,7 +24,7 @@ const Checkout: FC = () => {
     mutationFn: (data: any) => ordersApi.create(data),
     onSuccess: (response) => {
       clearCart();
-      navigate(`/orders/${response.data.id}`);
+      navigate(`/orders/${response.id}`);
     },
     onError: (error: any) => {
       const errorMsg = error.response?.data?.detail 

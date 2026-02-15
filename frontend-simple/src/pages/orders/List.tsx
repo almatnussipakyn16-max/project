@@ -32,7 +32,7 @@ const OrderList: FC = () => {
     );
   }
 
-  const orders = data?.data?.results || data?.data || [];
+  const orders = data?.results || [];
 
   return (
     <div className="container mx-auto px-4 py-8">

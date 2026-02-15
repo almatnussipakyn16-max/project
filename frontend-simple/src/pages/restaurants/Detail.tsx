@@ -57,7 +57,7 @@ const RestaurantDetail: FC = () => {
   }
 
   // Парсим меню
-  const menuItems = menuData?.results || menuData?.data?.results || menuData?.data || [];
+  const menuItems = menuData?.results || [];
 
   return (
     <div className="min-h-screen bg-gray-50">

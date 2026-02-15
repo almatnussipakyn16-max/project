@@ -19,7 +19,7 @@ const Profile: FC = () => {
       const accessToken = useAuthStore.getState().accessToken;
       const refreshToken = useAuthStore.getState().refreshToken;
       if (accessToken && refreshToken) {
-        setAuth(response.data, accessToken, refreshToken);
+        setAuth(response, accessToken, refreshToken);
       }
       setMessage('Профиль успешно обновлён');
       setIsEditing(false);
