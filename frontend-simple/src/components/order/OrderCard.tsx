@@ -50,7 +50,7 @@ const OrderCard: FC<OrderCardProps> = ({ order }) => {
 
       {/* Ресторан */}
       <div className="mb-4">
-        <p className="font-semibold">{order.restaurant?.name || 'Ресторан'}</p>
+        <p className="font-semibold">{order.restaurant_details?.name || 'Ресторан'}</p>
         <p className="text-sm text-gray-600">
           {order.items?.length || 0} {order.items?.length === 1 ? 'позиция' : 'позиции'}
         </p>

@@ -10,7 +10,7 @@ const Cart: FC = () => {
   const validItems = items.filter(item => item && item.menuItem && item.menuItem.id);
 
   const handleCheckout = () => {
-    navigate('/orders/create');
+    navigate('/checkout');
   };
 
   if (validItems.length === 0) {

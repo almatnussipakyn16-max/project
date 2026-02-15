@@ -9,6 +9,8 @@ interface CartItem {
   restaurantName: string;
 }
 
+export type { CartItem };
+
 interface CartStore {
   items: CartItem[];
   addItem: (menuItem: MenuItem, restaurantId: number, restaurantName: string) => void;
@@ -114,7 +116,7 @@ export const useCartStore = create<CartStore>()(
       version: 1, // ✅ Версия для миграции
       
       // ✅ Миграция старых данных
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: any) => {
         const state = persistedState as any;
         
         // Если нет items или пустой массив - вернуть как есть

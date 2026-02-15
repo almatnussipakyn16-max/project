@@ -34,6 +34,7 @@ export const TEXTS = {
   READY: 'Готов',
   OUT_FOR_DELIVERY: 'В пути',
   DELIVERED: 'Доставлен',
+  COMPLETED: 'Завершён',
   CANCELLED: 'Отменён',
   
   // Типы заказов
@@ -110,6 +111,7 @@ export const ORDER_STATUSES = {
   READY: { label: TEXTS.READY, color: 'bg-green-100 text-green-800' },
   OUT_FOR_DELIVERY: { label: TEXTS.OUT_FOR_DELIVERY, color: 'bg-indigo-100 text-indigo-800' },
   DELIVERED: { label: TEXTS.DELIVERED, color: 'bg-green-100 text-green-800' },
+  COMPLETED: { label: TEXTS.COMPLETED, color: 'bg-green-100 text-green-800' },
   CANCELLED: { label: TEXTS.CANCELLED, color: 'bg-red-100 text-red-800' },
 } as const;
 
