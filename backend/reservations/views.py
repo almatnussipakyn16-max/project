@@ -5,7 +5,11 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from django.utils import timezone
 from .models import Table, Reservation
-from .serializers import TableSerializer, ReservationSerializer
+from .serializers import (
+    TableSerializer, 
+    ReservationSerializer,
+    ReservationCreateSerializer  # ✅ ДОБАВИЛ ИМПОРТ
+)
 from .tasks import send_reservation_confirmation
 
 
@@ -17,8 +21,22 @@ class TableViewSet(viewsets.ModelViewSet):
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
-    serializer_class = ReservationSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ReservationCreateSerializer
+        return ReservationSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['ADMIN', 'STAFF', 'RESTAURANT_OWNER']:
+            return Reservation.objects.all()
+        return Reservation.objects.filter(user=user)
+    
+    def perform_create(self, serializer):
+        # Автоматически устанавливаем user
+        serializer.save(user=self.request.user)
     
     @action(detail=False, methods=['post'])
     def check_availability(self, request):
@@ -47,23 +65,17 @@ class ReservationViewSet(viewsets.ModelViewSet):
         )
         
         # Check for conflicting reservations (2 hour window)
-        # A reservation conflicts if it's within 2 hours before or after our time
         time_window_start_dt = reservation_datetime - timedelta(hours=1)
         time_window_end_dt = reservation_datetime + timedelta(hours=1)
         
-        # Get all reservations in the date range that could conflict
         conflicting_reservations = Reservation.objects.filter(
             restaurant_id=restaurant_id,
             status__in=['PENDING', 'CONFIRMED', 'SEATED']
         )
         
-        # Filter for reservations that overlap with our time window
-        # Reservation overlaps if:
-        # (reservation_datetime >= time_window_start) AND (reservation_datetime <= time_window_end)
         conflicts = []
         for res in conflicting_reservations:
             res_datetime = datetime.combine(res.reservation_date, res.reservation_time)
-            # Make timezone-aware for proper comparison
             if timezone.is_naive(res_datetime):
                 res_datetime = timezone.make_aware(res_datetime)
             

@@ -19,10 +19,28 @@ class Ticket(models.Model):
         HIGH = 'HIGH', _('High')
         URGENT = 'URGENT', _('Urgent')
     
+    # ✅ ДОБАВИЛ Category
+    class Category(models.TextChoices):
+        GENERAL = 'GENERAL', _('General')
+        TECHNICAL = 'TECHNICAL', _('Technical')
+        BILLING = 'BILLING', _('Billing')
+        ACCOUNT = 'ACCOUNT', _('Account')
+        ORDER = 'ORDER', _('Order')
+        RESERVATION = 'RESERVATION', _('Reservation')
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='support_tickets')
     ticket_number = models.CharField(_('ticket number'), max_length=50, unique=True)
     subject = models.CharField(_('subject'), max_length=255)
     description = models.TextField(_('description'))
+    
+    # ✅ ДОБАВИЛ поле category
+    category = models.CharField(
+        _('category'),
+        max_length=20,
+        choices=Category.choices,
+        default=Category.GENERAL
+    )
+    
     status = models.CharField(_('status'), max_length=20, choices=Status.choices, default=Status.OPEN)
     priority = models.CharField(_('priority'), max_length=20, choices=Priority.choices, default=Priority.MEDIUM)
     

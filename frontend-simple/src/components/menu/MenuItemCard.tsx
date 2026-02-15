@@ -4,16 +4,18 @@ import type { MenuItem } from '../../types';
 
 interface MenuItemCardProps {
   item: MenuItem;
+  restaurantId: number;
+  restaurantName: string;
 }
 
-const MenuItemCard: FC<MenuItemCardProps> = ({ item }) => {
+const MenuItemCard: FC<MenuItemCardProps> = ({ item, restaurantId, restaurantName }) => {
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
-    addItem(item);
+    // ✅ ФИКС: Передаём restaurantId и restaurantName
+    addItem(item, restaurantId, restaurantName);
   };
 
-  // Безопасное форматирование цены
   const price = typeof item.price === 'number' 
     ? item.price 
     : parseFloat(item.price || '0');

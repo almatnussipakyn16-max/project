@@ -7,21 +7,22 @@ import { useAuthStore } from './store/auth';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 
-// Pages - ВСЕ без фигурных скобок (default exports)
+// Pages
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import RestaurantList from './pages/restaurants/List';
 import RestaurantDetail from './pages/restaurants/Detail';
 import Cart from './pages/cart/Cart';
 import Checkout from './pages/checkout/Checkout';
 import OrderList from './pages/orders/List';
-import OrderDetail from './pages/orders/Detail';  // ← БЕЗ фигурных скобок
+import OrderDetail from './pages/orders/Detail';
 import ReservationList from './pages/reservations/List';
 import ReservationCreate from './pages/reservations/Create';
 import Profile from './pages/profile/Profile';
 import SupportTickets from './pages/support/Tickets';
 import SupportCreate from './pages/support/Create';
+import FAQ from './pages/FAQ';
+import Promotions from './pages/Promotions';
 
 // QueryClient instance
 const queryClient = new QueryClient({
@@ -57,8 +58,9 @@ const App: FC = () => {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/restaurants" element={<RestaurantList />} />
               <Route path="/restaurants/:id" element={<RestaurantDetail />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/promotions" element={<Promotions />} />
               
               {/* Protected Routes */}
               <Route

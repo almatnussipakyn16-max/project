@@ -7,7 +7,7 @@ import { Spinner } from '../../components/common/Spinner';
 
 const Checkout: FC = () => {
   const navigate = useNavigate();
-  const { items, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice, clearCart, getRestaurantId, getRestaurantName } = useCartStore();
 
   const [formData, setFormData] = useState({
     orderType: 'DELIVERY' as 'DELIVERY' | 'TAKEOUT',
@@ -53,13 +53,12 @@ const Checkout: FC = () => {
       }
     }
 
-    // Получить ID ресторана из первого товара
-    const restaurantId = items[0]?.menuItem?.category?.restaurant 
-      || items[0]?.menuItem?.restaurant
-      || null;
+    // ✅ ФИКС: Используем getRestaurantId из store
+    const restaurantId = getRestaurantId();
 
     if (!restaurantId) {
-      setError('Не удалось определить ресторан');
+      console.error('Cart items:', items);
+      setError('Не удалось определить ресторан. Пожалуйста, добавьте товары заново из страницы ресторана.');
       return;
     }
 
@@ -104,7 +103,7 @@ const Checkout: FC = () => {
         <span className="text-6xl mb-4 block">🛒</span>
         <h2 className="text-2xl font-bold mb-4">Корзина пуста</h2>
         <button
-          onClick={() => navigate('/restaurants')}
+          onClick={() => navigate('/')}
           className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
         >
           Перейти к ресторанам
@@ -114,10 +113,14 @@ const Checkout: FC = () => {
   }
 
   const total = getTotalPrice();
+  const restaurantName = getRestaurantName();
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Оформление заказа</h1>
+      <h1 className="text-3xl font-bold mb-2">Оформление заказа</h1>
+      {restaurantName && (
+        <p className="text-gray-600 mb-8">Ресторан: <span className="font-medium">{restaurantName}</span></p>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Форма */}

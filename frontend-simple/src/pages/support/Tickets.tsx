@@ -2,75 +2,151 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supportApi } from '../../api/support';
-import { Card } from '../../components/common/Card';
-import { Badge } from '../../components/common/Badge';
-import { Button } from '../../components/common/Button';
 import { Spinner } from '../../components/common/Spinner';
-import { TEXTS, TICKET_STATUSES, TICKET_PRIORITIES } from '../../utils/constants';
-import { formatDateTime } from '../../utils/formatters';
+import { formatDate } from '../../utils/formatters';
+import type { SupportTicket } from '../../api/types';
 
-export const Tickets: FC = () => {
+const SupportTickets: FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['support-tickets'],
     queryFn: () => supportApi.getAll(),
   });
 
+  const tickets = data?.results || [];
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      'OPEN': 'bg-blue-100 text-blue-800',
+      'IN_PROGRESS': 'bg-yellow-100 text-yellow-800',
+      'RESOLVED': 'bg-green-100 text-green-800',
+      'CLOSED': 'bg-gray-100 text-gray-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getStatusText = (status: string) => {
+    const texts: Record<string, string> = {
+      'OPEN': 'Открыт',
+      'IN_PROGRESS': 'В работе',
+      'RESOLVED': 'Решён',
+      'CLOSED': 'Закрыт',
+    };
+    return texts[status] || status;
+  };
+
+  const getPriorityColor = (priority: string) => {
+    const colors: Record<string, string> = {
+      'LOW': 'text-gray-600',
+      'MEDIUM': 'text-blue-600',
+      'HIGH': 'text-orange-600',
+      'URGENT': 'text-red-600',
+    };
+    return colors[priority] || 'text-gray-600';
+  };
+
+  const getPriorityText = (priority: string) => {
+    const texts: Record<string, string> = {
+      'LOW': 'Низкий',
+      'MEDIUM': 'Средний',
+      'HIGH': 'Высокий',
+      'URGENT': 'Срочный',
+    };
+    return texts[priority] || priority;
+  };
+
+  const getCategoryText = (category: string) => {
+    const texts: Record<string, string> = {
+      'GENERAL': 'Общий вопрос',
+      'TECHNICAL': 'Техническая проблема',
+      'BILLING': 'Вопрос по оплате',
+      'ACCOUNT': 'Проблема с аккаунтом',
+      'ORDER': 'Вопрос по заказу',
+      'RESERVATION': 'Вопрос по бронированию',
+    };
+    return texts[category] || category;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">{TEXTS.myTickets}</h1>
-        <Link to="/support/create">
-          <Button>{TEXTS.createTicket}</Button>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Мои тикеты поддержки</h1>
+        <Link
+          to="/support/create"
+          className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium"
+        >
+          + Создать тикет
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <Spinner size="lg" />
+      {tickets.length === 0 ? (
+        <div className="text-center py-16">
+          <span className="text-6xl mb-4 block">💬</span>
+          <p className="text-gray-500 text-lg mb-4">
+            У вас пока нет тикетов поддержки
+          </p>
+          <Link
+            to="/support/create"
+            className="inline-block px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+          >
+            Создать первый тикет
+          </Link>
         </div>
-      ) : data?.results && data.results.length > 0 ? (
+      ) : (
         <div className="space-y-4">
-          {data.results.map((ticket) => (
-            <Card key={ticket.id} className="p-6">
-              <div className="flex items-start justify-between mb-4">
+          {tickets.map((ticket: SupportTicket) => (
+            <div
+              key={ticket.id}
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+            >
+              <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold mb-1">
-                    {ticket.subject}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {ticket.ticket_number}
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold">
+                      {ticket.subject}
+                    </h3>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(ticket.status)}`}>
+                      {getStatusText(ticket.status)}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Тикет #{ticket.ticket_number || ticket.id}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Badge className={TICKET_STATUSES[ticket.status].color}>
-                    {TICKET_STATUSES[ticket.status].label}
-                  </Badge>
-                  <Badge className={TICKET_PRIORITIES[ticket.priority].color}>
-                    {TICKET_PRIORITIES[ticket.priority].label}
-                  </Badge>
-                </div>
+                <span className={`font-medium ${getPriorityColor(ticket.priority)}`}>
+                  {getPriorityText(ticket.priority)}
+                </span>
               </div>
 
-              <p className="text-gray-600 mb-4 line-clamp-2">
+              <p className="text-gray-700 mb-4 line-clamp-2">
                 {ticket.description}
               </p>
 
               <div className="flex items-center justify-between text-sm text-gray-500">
-                <span>Категория: {ticket.category}</span>
-                <span>Создан: {formatDateTime(ticket.created_at)}</span>
+                <div className="flex items-center gap-4">
+                  <span>📁 {getCategoryText(ticket.category)}</span>
+                  <span>📅 {formatDate(ticket.created_at)}</span>
+                </div>
+                <Link
+                  to={`/support/${ticket.id}`}
+                  className="text-orange-500 hover:text-orange-600 font-medium"
+                >
+                  Подробнее →
+                </Link>
               </div>
-            </Card>
+            </div>
           ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg mb-4">{TEXTS.noResults}</p>
-          <Link to="/support/create">
-            <Button>{TEXTS.createTicket}</Button>
-          </Link>
         </div>
       )}
     </div>
   );
 };
-export default Tickets;
+
+export default SupportTickets;

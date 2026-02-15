@@ -51,3 +51,14 @@ export const truncateText = (text: string, maxLength: number): string => {
 export const getInitials = (firstName: string, lastName: string): string => {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 };
+
+// ✅ ДОБАВИЛ: Безопасное форматирование рейтинга
+export const formatRating = (rating: string | number | undefined | null): string => {
+  if (rating === undefined || rating === null || rating === '') return '0.0';
+  
+  const numRating = typeof rating === 'number' 
+    ? rating 
+    : parseFloat(String(rating));
+  
+  return isNaN(numRating) ? '0.0' : numRating.toFixed(1);
+};

@@ -1,6 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User } from '../api/types';
+
+interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: 'ADMIN' | 'RESTAURANT_OWNER' | 'STAFF' | 'CUSTOMER' | 'DEVELOPER';
+  phone?: string;
+  avatar?: string;
+}
 
 interface AuthState {
   user: User | null;
@@ -8,8 +17,7 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
-  clearAuth: () => void;
-  updateUser: (user: User) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -31,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
-      clearAuth: () => {
+      logout: () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         set({
@@ -41,13 +49,16 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
         });
       },
-
-      updateUser: (user) => {
-        set({ user });
-      },
     }),
     {
       name: 'auth-storage',
+      // ✅ ФИКС: Правильная инициализация из localStorage
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );

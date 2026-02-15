@@ -7,30 +7,35 @@ import { Spinner } from '../../components/common/Spinner';
 
 const ReservationCreate: FC = () => {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     restaurant: '',
     reservation_date: '',
     reservation_time: '',
-    guest_count: 2,
+    guest_count: 2,  // ✅ Изменил с party_size на guest_count
     special_requests: '',
   });
   const [error, setError] = useState('');
 
-  // Получить список ресторанов
   const { data: restaurantsData, isLoading: restaurantsLoading } = useQuery({
     queryKey: ['restaurants'],
     queryFn: () => restaurantsApi.getAll(),
   });
 
-  // Создать бронь
+  const restaurants = restaurantsData?.results || [];
+
   const createMutation = useMutation({
-    mutationFn: (data: typeof formData) => reservationsApi.create(data),
+    mutationFn: (data: any) => reservationsApi.create(data),
     onSuccess: () => {
       navigate('/reservations');
     },
     onError: (error: any) => {
-      setError(error.response?.data?.detail || 'Ошибка создания бронирования');
+      console.error('Reservation error:', error.response?.data);
+      const errorMsg = error.response?.data?.detail 
+        || error.response?.data?.message
+        || JSON.stringify(error.response?.data)
+        || 'Ошибка создания бронирования';
+      setError(errorMsg);
     },
   });
 
@@ -43,23 +48,19 @@ const ReservationCreate: FC = () => {
       return;
     }
 
-    if (formData.guest_count < 1 || formData.guest_count > 20) {
-      setError('Количество гостей должно быть от 1 до 20');
-      return;
-    }
-
+    console.log('Submitting reservation:', formData);
     createMutation.mutate({
-      ...formData,
       restaurant: Number(formData.restaurant),
+      reservation_date: formData.reservation_date,
+      reservation_time: formData.reservation_time,
+      guest_count: Number(formData.guest_count),  // ✅ guest_count
+      special_requests: formData.special_requests,
     });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'guest_count' ? Number(value) : value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   if (restaurantsLoading) {
@@ -70,27 +71,22 @@ const ReservationCreate: FC = () => {
     );
   }
 
-  const restaurants = restaurantsData?.data?.results || restaurantsData?.data || [];
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Создать бронирование</h1>
+        <h1 className="text-3xl font-bold mb-8">Забронировать столик</h1>
 
         <div className="bg-white rounded-lg shadow-md p-8">
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800">{error}</p>
+              <p className="text-red-800 whitespace-pre-wrap">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit}>
             {/* Выбор ресторана */}
             <div className="mb-6">
-              <label
-                htmlFor="restaurant"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label htmlFor="restaurant" className="block text-sm font-medium text-gray-700 mb-2">
                 Ресторан <span className="text-red-500">*</span>
               </label>
               <select
@@ -104,18 +100,20 @@ const ReservationCreate: FC = () => {
                 <option value="">Выберите ресторан</option>
                 {restaurants.map((restaurant: any) => (
                   <option key={restaurant.id} value={restaurant.id}>
-                    {restaurant.name}
+                    {restaurant.name} - {restaurant.city}
                   </option>
                 ))}
               </select>
+              {restaurants.length === 0 && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Рестораны не найдены
+                </p>
+              )}
             </div>
 
             {/* Дата */}
             <div className="mb-6">
-              <label
-                htmlFor="reservation_date"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label htmlFor="reservation_date" className="block text-sm font-medium text-gray-700 mb-2">
                 Дата <span className="text-red-500">*</span>
               </label>
               <input
@@ -132,10 +130,7 @@ const ReservationCreate: FC = () => {
 
             {/* Время */}
             <div className="mb-6">
-              <label
-                htmlFor="reservation_time"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label htmlFor="reservation_time" className="block text-sm font-medium text-gray-700 mb-2">
                 Время <span className="text-red-500">*</span>
               </label>
               <input
@@ -151,11 +146,8 @@ const ReservationCreate: FC = () => {
 
             {/* Количество гостей */}
             <div className="mb-6">
-              <label
-                htmlFor="guest_count"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Количество гостей <span className="text-red-500">*</span>
+              <label htmlFor="guest_count" className="block text-sm font-medium text-gray-700 mb-2">
+                Количество гостей
               </label>
               <input
                 id="guest_count"
@@ -163,19 +155,15 @@ const ReservationCreate: FC = () => {
                 name="guest_count"
                 value={formData.guest_count}
                 onChange={handleChange}
-                min="1"
-                max="20"
+                min={1}
+                max={20}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                required
               />
             </div>
 
             {/* Особые пожелания */}
             <div className="mb-6">
-              <label
-                htmlFor="special_requests"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label htmlFor="special_requests" className="block text-sm font-medium text-gray-700 mb-2">
                 Особые пожелания
               </label>
               <textarea
@@ -185,7 +173,7 @@ const ReservationCreate: FC = () => {
                 onChange={handleChange}
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-                placeholder="Например: окно с видом, детский стульчик и т.д."
+                placeholder="Детское кресло, столик у окна и т.д."
               />
             </div>
 
@@ -194,9 +182,9 @@ const ReservationCreate: FC = () => {
               <button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition disabled:opacity-50"
               >
-                {createMutation.isPending ? 'Создание...' : 'Создать бронирование'}
+                {createMutation.isPending ? 'Бронирование...' : 'Забронировать'}
               </button>
               <button
                 type="button"
@@ -207,6 +195,17 @@ const ReservationCreate: FC = () => {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Информация */}
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="text-lg font-bold mb-2">ℹ️ Информация</h3>
+          <ul className="list-disc list-inside space-y-1 text-gray-700">
+            <li>Бронирование подтверждается автоматически</li>
+            <li>Вы получите уведомление на email</li>
+            <li>Отменить бронь можно за 2 часа до времени</li>
+            <li>При опоздании более 15 минут бронь может быть отменена</li>
+          </ul>
         </div>
       </div>
     </div>

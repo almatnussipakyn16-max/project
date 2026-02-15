@@ -1,16 +1,21 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { reservationsApi } from '../../api/reservations';
 import { Spinner } from '../../components/common/Spinner';
 
-const ReservationList: FC = () => {
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'CANCELLED'>('ALL');
-
+const ReservationsList: FC = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['reservations', statusFilter],
-    queryFn: () => reservationsApi.getAll(statusFilter !== 'ALL' ? { status: statusFilter } : {}),
+    queryKey: ['reservations'],
+    queryFn: () => reservationsApi.getAll(),
   });
+
+  // ✅ Парсим results
+  const reservations = data?.results || [];
+
+  console.log('🔍 API data:', data);
+  console.log('📋 Reservations:', reservations);
+  console.log('📊 Count:', reservations.length);
 
   if (isLoading) {
     return (
@@ -30,112 +35,131 @@ const ReservationList: FC = () => {
     );
   }
 
-  const reservations = data?.data?.results || data?.data || [];
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      'PENDING': 'bg-yellow-100 text-yellow-800',
+      'CONFIRMED': 'bg-green-100 text-green-800',
+      'SEATED': 'bg-blue-100 text-blue-800',
+      'COMPLETED': 'bg-gray-100 text-gray-800',
+      'CANCELLED': 'bg-red-100 text-red-800',
+      'NO_SHOW': 'bg-red-100 text-red-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getStatusText = (status: string) => {
+    const texts: Record<string, string> = {
+      'PENDING': 'Ожидает подтверждения',
+      'CONFIRMED': 'Подтверждено',
+      'SEATED': 'За столом',
+      'COMPLETED': 'Завершено',
+      'CANCELLED': 'Отменено',
+      'NO_SHOW': 'Не явился',
+    };
+    return texts[status] || status;
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Мои бронирования</h1>
-        
-        {/* Кнопка создать бронь */}
         <Link
           to="/reservations/create"
           className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium"
         >
-          + Создать бронь
+          + Создать бронирование
         </Link>
       </div>
 
-      {/* Фильтр по статусу */}
-      <div className="mb-6">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-        >
-          <option value="ALL">Все бронирования</option>
-          <option value="PENDING">Ожидает</option>
-          <option value="CONFIRMED">Подтверждено</option>
-          <option value="CANCELLED">Отменено</option>
-        </select>
-      </div>
-
-      {/* Список бронирований */}
       {reservations.length === 0 ? (
         <div className="text-center py-16">
           <span className="text-6xl mb-4 block">📅</span>
           <p className="text-gray-500 text-lg mb-4">
-            {statusFilter === 'ALL' 
-              ? 'У вас пока нет бронирований' 
-              : `Нет бронирований со статусом "${statusFilter}"`}
+            У вас пока нет бронирований
           </p>
           <Link
             to="/reservations/create"
             className="inline-block px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
           >
-            Создать бронирование
+            Забронировать столик
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {reservations.map((reservation: any) => (
             <div
               key={reservation.id}
-              className="bg-white rounded-lg shadow-md p-6"
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-sm text-gray-500">
-                    Бронь #{reservation.reservation_number || reservation.id}
-                  </p>
-                  <h3 className="text-xl font-bold mt-1">
-                    {reservation.restaurant?.name || 'Ресторан'}
-                  </h3>
-                </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    reservation.status === 'CONFIRMED'
-                      ? 'bg-green-100 text-green-800'
-                      : reservation.status === 'PENDING'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {reservation.status === 'CONFIRMED' && 'Подтверждено'}
-                  {reservation.status === 'PENDING' && 'Ожидает'}
-                  {reservation.status === 'CANCELLED' && 'Отменено'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Дата</p>
-                  <p className="font-medium">
-                    {new Date(reservation.reservation_date).toLocaleDateString('ru-RU')}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Время</p>
-                  <p className="font-medium">{reservation.reservation_time}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Гостей</p>
-                  <p className="font-medium">{reservation.guest_count}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Стол</p>
-                  <p className="font-medium">
-                    {reservation.table?.table_number || 'Не назначен'}
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-bold">
+                      Бронирование #{reservation.reservation_number}
+                    </h3>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(reservation.status)}`}>
+                      {getStatusText(reservation.status)}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Ресторан ID: {reservation.restaurant}
                   </p>
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                {/* Дата */}
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">📅</span>
+                  <div>
+                    <p className="text-sm text-gray-500">Дата</p>
+                    <p className="font-medium">{reservation.reservation_date}</p>
+                  </div>
+                </div>
+
+                {/* Время */}
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🕐</span>
+                  <div>
+                    <p className="text-sm text-gray-500">Время</p>
+                    <p className="font-medium">{reservation.reservation_time?.slice(0, 5)}</p>
+                  </div>
+                </div>
+
+                {/* Гости */}
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">👥</span>
+                  <div>
+                    <p className="text-sm text-gray-500">Гостей</p>
+                    <p className="font-medium">{reservation.guest_count}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Особые пожелания */}
               {reservation.special_requests && (
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm text-gray-500">Особые пожелания:</p>
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-500 mb-1">Особые пожелания:</p>
                   <p className="text-gray-700">{reservation.special_requests}</p>
                 </div>
               )}
+
+              {/* Действия */}
+              <div className="flex gap-3">
+                <Link
+                  to={`/reservations/${reservation.id}`}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Подробнее
+                </Link>
+                {reservation.status === 'PENDING' && (
+                  <button
+                    className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition"
+                  >
+                    Отменить
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -144,4 +168,4 @@ const ReservationList: FC = () => {
   );
 };
 
-export default ReservationList;
+export default ReservationsList;

@@ -1,98 +1,155 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { MenuItem } from '../api/types';
+import type { MenuItem } from '../types';
 
-export interface CartItem {
+interface CartItem {
   menuItem: MenuItem;
   quantity: number;
-  modifiers?: string[];
-  specialInstructions?: string;
+  restaurantId: number;
+  restaurantName: string;
 }
 
-interface CartState {
+interface CartStore {
   items: CartItem[];
-  restaurantId: number | null;
-  addItem: (item: MenuItem, restaurantId: number, modifiers?: string[], specialInstructions?: string) => void;
-  removeItem: (itemId: number) => void;
-  updateQuantity: (itemId: number, quantity: number) => void;
+  addItem: (menuItem: MenuItem, restaurantId: number, restaurantName: string) => void;
+  removeItem: (menuItemId: number) => void;
+  updateQuantity: (menuItemId: number, quantity: number) => void;
   clearCart: () => void;
-  getItemCount: () => number;
   getTotalPrice: () => number;
-  getSubtotal: () => number;
+  getRestaurantId: () => number | null;
+  getRestaurantName: () => string | null;
 }
 
-export const useCartStore = create<CartState>()(
+export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-      restaurantId: null,
 
-      addItem: (menuItem, restaurantId, modifiers, specialInstructions) => {
-        const state = get();
+      addItem: (menuItem, restaurantId, restaurantName) => {
+        const currentItems = get().items;
         
-        // Если это другой ресторан, очищаем корзину
-        if (state.restaurantId && state.restaurantId !== restaurantId) {
-          if (!confirm('Добавление блюда из другого ресторана очистит корзину. Продолжить?')) {
-            return;
-          }
-          set({ items: [], restaurantId });
+        if (currentItems.length > 0 && currentItems[0].restaurantId !== restaurantId) {
+          const confirmClear = window.confirm(
+            `В корзине есть товары из "${currentItems[0].restaurantName}". Очистить корзину и добавить товар из "${restaurantName}"?`
+          );
+          if (!confirmClear) return;
+          set({ items: [] });
         }
 
-        const existing = state.items.find(i => i.menuItem.id === menuItem.id);
-        
-        if (existing) {
+        const existingItem = get().items.find(
+          (item) => item.menuItem?.id === menuItem.id
+        );
+
+        if (existingItem) {
           set({
-            items: state.items.map(i =>
-              i.menuItem.id === menuItem.id
-                ? { ...i, quantity: i.quantity + 1 }
-                : i
+            items: get().items.map((item) =>
+              item.menuItem?.id === menuItem.id
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
             ),
           });
         } else {
           set({
-            items: [...state.items, { menuItem, quantity: 1, modifiers, specialInstructions }],
-            restaurantId,
+            items: [
+              ...get().items,
+              { 
+                menuItem, 
+                quantity: 1,
+                restaurantId,
+                restaurantName,
+              },
+            ],
           });
         }
       },
 
-      removeItem: (itemId) => set((state) => ({
-        items: state.items.filter(i => i.menuItem.id !== itemId),
-        restaurantId: state.items.length === 1 ? null : state.restaurantId,
-      })),
-
-      updateQuantity: (itemId, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(itemId);
-          return;
-        }
-        set((state) => ({
-          items: state.items.map(i =>
-            i.menuItem.id === itemId ? { ...i, quantity } : i
-          ),
-        }));
+      removeItem: (menuItemId) => {
+        set({
+          items: get().items.filter((item) => item.menuItem?.id !== menuItemId),
+        });
       },
 
-      clearCart: () => set({ items: [], restaurantId: null }),
+      updateQuantity: (menuItemId, quantity) => {
+        if (quantity <= 0) {
+          get().removeItem(menuItemId);
+          return;
+        }
 
-      getItemCount: () => {
-        const items = get().items;
-        return items.reduce((sum, item) => sum + item.quantity, 0);
+        set({
+          items: get().items.map((item) =>
+            item.menuItem?.id === menuItemId ? { ...item, quantity } : item
+          ),
+        });
+      },
+
+      clearCart: () => {
+        set({ items: [] });
       },
 
       getTotalPrice: () => {
-        return get().getSubtotal();
+        return get().items.reduce((total, item) => {
+          if (!item || !item.menuItem || item.menuItem.price == null) {
+            return total;
+          }
+          
+          const price = typeof item.menuItem.price === 'number'
+            ? item.menuItem.price
+            : parseFloat(item.menuItem.price || '0');
+          return total + price * item.quantity;
+        }, 0);
       },
 
-      getSubtotal: () => {
+      getRestaurantId: () => {
         const items = get().items;
-        return items.reduce((sum, item) => 
-          sum + parseFloat(item.menuItem.price) * item.quantity, 0
-        );
+        return items.length > 0 && items[0] ? items[0].restaurantId : null;
+      },
+
+      getRestaurantName: () => {
+        const items = get().items;
+        return items.length > 0 && items[0] ? items[0].restaurantName : null;
       },
     }),
     {
       name: 'cart-storage',
+      version: 1, // ✅ Версия для миграции
+      
+      // ✅ Миграция старых данных
+      migrate: (persistedState: any, version: number) => {
+        const state = persistedState as any;
+        
+        // Если нет items или пустой массив - вернуть как есть
+        if (!state?.items || !Array.isArray(state.items)) {
+          return { items: [] };
+        }
+
+        // ✅ Проверяем и исправляем формат каждого элемента
+        state.items = state.items
+          .map((item: any) => {
+            // Если это старый формат (прямо объект MenuItem без обёртки)
+            if (item.id && item.name && !item.menuItem) {
+              console.warn('Migrating old cart item format:', item);
+              // Конвертируем в новый формат
+              return {
+                menuItem: item,
+                quantity: item.quantity || 1,
+                restaurantId: item.restaurantId || item.restaurant || 0,
+                restaurantName: item.restaurantName || 'Unknown',
+              };
+            }
+            
+            // Если уже правильный формат - оставляем как есть
+            if (item.menuItem && item.quantity) {
+              return item;
+            }
+            
+            // Битые данные - пропускаем
+            console.warn('Removing invalid cart item:', item);
+            return null;
+          })
+          .filter((item: any) => item !== null); // Убираем null
+
+        return state;
+      },
     }
   )
 );

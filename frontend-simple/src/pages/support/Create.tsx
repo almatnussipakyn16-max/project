@@ -1,113 +1,109 @@
-import { FC, useState, FormEvent } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { supportApi } from '../../api/support';
-import { Card } from '../../components/common/Card';
-import { Input } from '../../components/common/Input';
-import { Button } from '../../components/common/Button';
-import { TEXTS } from '../../utils/constants';
-import type { TicketPriority } from '../../api/types';
-import Create from '../reservations/Create';
+import type { CreateTicketRequest } from '../../api/types';
 
-const CATEGORIES = [
-  'Заказ',
-  'Доставка',
-  'Оплата',
-  'Техническая проблема',
-  'Жалоба',
-  'Другое',
-];
-
-export const CreateTicket: FC = () => {
+const SupportCreate: FC = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  
+  const [formData, setFormData] = useState<CreateTicketRequest>({
     subject: '',
+    category: 'GENERAL',
+    priority: 'MEDIUM',
     description: '',
-    category: '',
-    priority: 'MEDIUM' as TicketPriority,
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState('');
 
   const createMutation = useMutation({
-    mutationFn: supportApi.create,
+    mutationFn: (data: CreateTicketRequest) => supportApi.create(data),
     onSuccess: () => {
       navigate('/support');
     },
     onError: (error: any) => {
-      alert('Ошибка создания тикета: ' + (error.response?.data?.detail || 'Неизвестная ошибка'));
+      setError(error.response?.data?.detail || 'Ошибка создания тикета');
     },
   });
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.subject) {
-      newErrors.subject = TEXTS.required;
-    }
-    if (!formData.description) {
-      newErrors.description = TEXTS.required;
-    }
-    if (!formData.category) {
-      newErrors.category = TEXTS.required;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    setError('');
+
+    if (!formData.subject || !formData.description) {
+      setError('Заполните все обязательные поля');
+      return;
+    }
 
     createMutation.mutate(formData);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">{TEXTS.createTicket}</h1>
+        <h1 className="text-3xl font-bold mb-8">Создать тикет поддержки</h1>
 
-        <Card className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              label={TEXTS.ticketSubject}
-              value={formData.subject}
-              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              error={errors.subject}
-              placeholder="Краткое описание проблемы"
-              required
-            />
+        <div className="bg-white rounded-lg shadow-md p-8">
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800">{error}</p>
+            </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Категория <span className="text-red-500">*</span>
+          <form onSubmit={handleSubmit}>
+            {/* Тема */}
+            <div className="mb-6">
+              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                Тема <span className="text-red-500">*</span>
               </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              <input
+                id="subject"
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                placeholder="Кратко опишите проблему"
                 required
-              >
-                <option value="">Выберите категорию</option>
-                {CATEGORIES.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              {errors.category && (
-                <p className="mt-1 text-sm text-red-500">{errors.category}</p>
-              )}
+              />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {TEXTS.ticketPriority}
+            {/* Категория */}
+            <div className="mb-6">
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                Категория
               </label>
               <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="GENERAL">Общий вопрос</option>
+                <option value="TECHNICAL">Техническая проблема</option>
+                <option value="BILLING">Вопрос по оплате</option>
+                <option value="ACCOUNT">Проблема с аккаунтом</option>
+                <option value="ORDER">Вопрос по заказу</option>
+                <option value="RESERVATION">Вопрос по бронированию</option>
+              </select>
+            </div>
+
+            {/* Приоритет */}
+            <div className="mb-6">
+              <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
+                Приоритет
+              </label>
+              <select
+                id="priority"
+                name="priority"
                 value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value as TicketPriority })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
               >
                 <option value="LOW">Низкий</option>
                 <option value="MEDIUM">Средний</option>
@@ -116,43 +112,45 @@ export const CreateTicket: FC = () => {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {TEXTS.ticketDescription} <span className="text-red-500">*</span>
+            {/* Описание */}
+            <div className="mb-6">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Описание проблемы <span className="text-red-500">*</span>
               </label>
               <textarea
+                id="description"
+                name="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={handleChange}
                 rows={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Подробно опишите вашу проблему..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                placeholder="Подробно опишите вашу проблему или вопрос..."
                 required
               />
-              {errors.description && (
-                <p className="mt-1 text-sm text-red-500">{errors.description}</p>
-              )}
             </div>
 
+            {/* Кнопки */}
             <div className="flex gap-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => navigate('/support')}
-              >
-                {TEXTS.cancel}
-              </Button>
-              <Button
+              <button
                 type="submit"
-                isLoading={createMutation.isPending}
-                className="flex-1"
+                disabled={createMutation.isPending}
+                className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition disabled:opacity-50"
               >
-                {TEXTS.submit}
-              </Button>
+                {createMutation.isPending ? 'Создание...' : 'Создать тикет'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/support')}
+                className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              >
+                Отмена
+              </button>
             </div>
           </form>
-        </Card>
+        </div>
       </div>
     </div>
   );
 };
-export default Create;
+
+export default SupportCreate;
