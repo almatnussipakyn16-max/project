@@ -43,7 +43,3 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(favorite)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    def perform_create(self, serializer):
-        """Set the user when creating a favorite."""
-        serializer.save(user=self.request.user)

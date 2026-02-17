@@ -28,23 +28,29 @@ class OwnerRestaurantViewSet(viewsets.ViewSet):
     
     permission_classes = [permissions.IsAuthenticated, IsRestaurantOwner]
     
+    def _get_owner_restaurant(self, request):
+        """Helper to get owner's restaurant."""
+        try:
+            return Restaurant.objects.get(owner=request.user)
+        except Restaurant.DoesNotExist:
+            return None
+    
     def list(self, request):
         """Get owner's restaurant."""
-        try:
-            restaurant = Restaurant.objects.get(owner=request.user)
-            serializer = RestaurantSerializer(restaurant)
-            return Response(serializer.data)
-        except Restaurant.DoesNotExist:
+        restaurant = self._get_owner_restaurant(request)
+        if not restaurant:
             return Response(
                 {'error': 'No restaurant found for this owner'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+        serializer = RestaurantSerializer(restaurant)
+        return Response(serializer.data)
     
     def update(self, request, pk=None):
         """Update owner's restaurant."""
-        try:
-            restaurant = Restaurant.objects.get(owner=request.user)
-        except Restaurant.DoesNotExist:
+        restaurant = self._get_owner_restaurant(request)
+        if not restaurant:
             return Response(
                 {'error': 'No restaurant found for this owner'},
                 status=status.HTTP_404_NOT_FOUND

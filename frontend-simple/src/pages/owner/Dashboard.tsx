@@ -120,7 +120,7 @@ const OwnerDashboard: FC = () => {
                     <div>
                       <p className="font-semibold">Order #{order.order_number}</p>
                       <p className="text-sm text-gray-600">
-                        {order.order_type} - ${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}
+                        {order.order_type} - ${parseFloat(String(order.total || 0)).toFixed(2)}
                       </p>
                     </div>
                     <span className={`px-2 py-1 text-xs rounded ${

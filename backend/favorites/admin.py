@@ -11,5 +11,5 @@ class FavoriteAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at']
     
     def has_add_permission(self, request):
-        """Favorites should be added through the API."""
+        """Disable adding favorites through admin - should be done via user-facing API."""
         return False

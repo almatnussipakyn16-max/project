@@ -6,7 +6,7 @@ from restaurants.serializers import RestaurantSerializer
 class FavoriteSerializer(serializers.ModelSerializer):
     """Favorite serializer."""
     restaurant = RestaurantSerializer(read_only=True)
-    restaurant_id = serializers.IntegerField(write_only=True, source='restaurant.id')
+    restaurant_id = serializers.IntegerField(write_only=True)
     
     class Meta:
         model = Favorite
@@ -15,7 +15,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create favorite with user from request context."""
-        restaurant_id = validated_data.pop('restaurant')['id']
+        restaurant_id = validated_data.pop('restaurant_id')
         user = self.context['request'].user
         
         # Check if already favorited

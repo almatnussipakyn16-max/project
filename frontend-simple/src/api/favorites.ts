@@ -25,16 +25,4 @@ export const favoritesApi = {
   remove: async (id: number): Promise<void> => {
     await api.delete(`/favorites/${id}/`);
   },
-
-  /**
-   * Check if a restaurant is favorited
-   */
-  isFavorited: async (restaurantId: number): Promise<boolean> => {
-    try {
-      const response = await api.get<PaginatedResponse<Favorite>>('/favorites/');
-      return response.data.results.some(fav => fav.restaurant.id === restaurantId);
-    } catch (error) {
-      return false;
-    }
-  },
 };
