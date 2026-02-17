@@ -44,6 +44,7 @@ urlpatterns = [
     path('api/developers/', include('developers.urls')),
     path('api/promotions/', include('promotions.urls')),
     path('api/analytics/', include('analytics.urls')),
+    path('api/favorites/', include('favorites.urls')),
     
     # JWT Authentication
     path('api/auth/', include('djoser.urls')),

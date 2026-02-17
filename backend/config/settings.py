@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'developers.apps.DevelopersConfig',
     'promotions.apps.PromotionsConfig',
     'analytics.apps.AnalyticsConfig',
+    'favorites.apps.FavoritesConfig',
 ]
 
 MIDDLEWARE = [

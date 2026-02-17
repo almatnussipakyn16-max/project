@@ -2,31 +2,41 @@ import api from './client';
 import type { LoginRequest, LoginResponse, RegisterRequest, User } from './types';
 
 export const authApi = {
-  // Вход
+  /**
+   * User login
+   */
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const { data } = await api.post<LoginResponse>('/auth/jwt/create/', credentials);
     return data;
   },
 
-  // Регистрация
+  /**
+   * User registration
+   */
   register: async (userData: RegisterRequest): Promise<User> => {
     const { data } = await api.post<User>('/auth/users/', userData);
     return data;
   },
 
-  // Получить текущего пользователя
+  /**
+   * Get current user profile
+   */
   getCurrentUser: async (): Promise<User> => {
     const { data } = await api.get<User>('/auth/users/me/');
     return data;
   },
 
-  // Обновить профиль
+  /**
+   * Update current user profile
+   */
   updateProfile: async (updates: Partial<User>): Promise<User> => {
     const { data } = await api.patch<User>('/auth/users/me/', updates);
     return data;
   },
 
-  // Выход (очистка токенов на клиенте)
+  /**
+   * Logout (clear tokens on client)
+   */
   logout: () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
