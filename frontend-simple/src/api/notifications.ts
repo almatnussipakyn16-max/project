@@ -1,23 +1,36 @@
-import api from './client';
+import api from './axios';
 import type { Notification, PaginatedResponse } from './types';
 
 export const notificationsApi = {
-  // Получить список уведомлений
+  /**
+   * Get all notifications for the current user
+   */
   getAll: async (): Promise<PaginatedResponse<Notification>> => {
     const { data } = await api.get<PaginatedResponse<Notification>>('/notifications/');
     return data;
   },
 
-  // Отметить уведомление как прочитанное
+  /**
+   * Mark a notification as read
+   */
   markAsRead: async (id: number): Promise<Notification> => {
-    const { data } = await api.patch<Notification>(`/notifications/${id}/`, {
-      is_read: true,
-    });
+    const { data } = await api.patch<Notification>(`/notifications/${id}/mark_as_read/`);
     return data;
   },
 
-  // Отметить все уведомления как прочитанные
-  markAllAsRead: async (): Promise<void> => {
-    await api.post('/notifications/mark-all-read/');
+  /**
+   * Mark all notifications as read
+   */
+  markAllAsRead: async (): Promise<{ message: string; count: number }> => {
+    const { data } = await api.post<{ message: string; count: number }>('/notifications/mark_all_as_read/');
+    return data;
+  },
+
+  /**
+   * Get count of unread notifications
+   */
+  getUnreadCount: async (): Promise<number> => {
+    const { data } = await api.get<{ count: number }>('/notifications/unread_count/');
+    return data.count;
   },
 };

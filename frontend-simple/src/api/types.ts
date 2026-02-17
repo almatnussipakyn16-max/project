@@ -337,3 +337,31 @@ export interface CreateTicketRequest {
   description: string;
   priority?: TicketPriority;
 }
+
+// ==========================================
+// FAVORITE
+// ==========================================
+export interface Favorite {
+  id: number;
+  user: number;
+  restaurant: Restaurant;
+  created_at: string;
+}
+
+export interface CreateFavoriteRequest {
+  restaurant: number;
+}
+
+// ==========================================
+// TABLE
+// ==========================================
+export interface Table {
+  id: number;
+  restaurant: number;
+  table_number: string;
+  capacity: number;
+  is_available: boolean;
+  location?: string;
+  created_at: string;
+  updated_at: string;
+}
