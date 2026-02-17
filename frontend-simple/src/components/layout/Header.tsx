@@ -58,6 +58,25 @@ const Header: FC = () => {
             {/* Авторизация */}
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
+                {/* Favorites */}
+                <Link
+                  to="/favorites"
+                  className="text-gray-700 hover:text-orange-500 transition"
+                  title="Favorites"
+                >
+                  ❤️
+                </Link>
+
+                {/* Owner Panel Link */}
+                {user?.role === 'RESTAURANT_OWNER' && (
+                  <Link
+                    to="/owner"
+                    className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition text-sm"
+                  >
+                    🏪 Owner Panel
+                  </Link>
+                )}
+
                 <Link
                   to="/profile"
                   className="text-gray-700 hover:text-orange-500 transition"

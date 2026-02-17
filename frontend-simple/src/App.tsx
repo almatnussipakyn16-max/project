@@ -20,10 +20,12 @@ import OrderDetail from './pages/orders/Detail';
 import ReservationList from './pages/reservations/List';
 import ReservationCreate from './pages/reservations/Create';
 import Profile from './pages/profile/Profile';
+import Favorites from './pages/profile/Favorites';
 import SupportTickets from './pages/support/Tickets';
 import SupportCreate from './pages/support/Create';
 import FAQ from './pages/FAQ';
 import Promotions from './pages/Promotions';
+import OwnerDashboard from './pages/owner/Dashboard';
 
 // QueryClient instance
 const queryClient = new QueryClient({
@@ -41,6 +43,21 @@ const ProtectedRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Owner Route Component (requires RESTAURANT_OWNER role)
+const OwnerRoute: FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (user?.role !== 'RESTAURANT_OWNER') {
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
@@ -122,6 +139,14 @@ const App: FC = () => {
                   }
                 />
                 <Route
+                  path="/favorites"
+                  element={
+                    <ProtectedRoute>
+                      <Favorites />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/support"
                   element={
                     <ProtectedRoute>
@@ -135,6 +160,24 @@ const App: FC = () => {
                     <ProtectedRoute>
                       <SupportCreate />
                     </ProtectedRoute>
+                  }
+                />
+                
+                {/* Owner Panel Routes */}
+                <Route
+                  path="/owner"
+                  element={
+                    <OwnerRoute>
+                      <OwnerDashboard />
+                    </OwnerRoute>
+                  }
+                />
+                <Route
+                  path="/owner/dashboard"
+                  element={
+                    <OwnerRoute>
+                      <OwnerDashboard />
+                    </OwnerRoute>
                   }
                 />
                 
