@@ -1,4 +1,4 @@
-import api from './axios';
+import api from './client';
 import type { Reservation, PaginatedResponse } from './types';
 
 export interface CreateReservationRequest {

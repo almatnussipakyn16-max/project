@@ -10,6 +10,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('role', 'is_active', 'is_email_verified', 'created_at')
     search_fields = ('email', 'first_name', 'last_name', 'phone')
     ordering = ('-created_at',)
+    actions = ['ban_users', 'unban_users', 'make_owner', 'make_staff', 'make_customer']
     
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -27,6 +28,36 @@ class UserAdmin(BaseUserAdmin):
     )
     
     readonly_fields = ('created_at', 'updated_at', 'last_login', 'date_joined')
+    
+    def ban_users(self, request, queryset):
+        """Ban selected users."""
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f'{updated} user(s) successfully banned.')
+    ban_users.short_description = "Ban selected users"
+    
+    def unban_users(self, request, queryset):
+        """Unban selected users."""
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f'{updated} user(s) successfully unbanned.')
+    unban_users.short_description = "Unban selected users"
+    
+    def make_owner(self, request, queryset):
+        """Change role to restaurant owner."""
+        updated = queryset.update(role='RESTAURANT_OWNER')
+        self.message_user(request, f'{updated} user(s) changed to Restaurant Owner role.')
+    make_owner.short_description = "Make Restaurant Owner"
+    
+    def make_staff(self, request, queryset):
+        """Change role to staff."""
+        updated = queryset.update(role='STAFF', is_staff=True)
+        self.message_user(request, f'{updated} user(s) changed to Staff role.')
+    make_staff.short_description = "Make Staff"
+    
+    def make_customer(self, request, queryset):
+        """Change role to customer."""
+        updated = queryset.update(role='CUSTOMER')
+        self.message_user(request, f'{updated} user(s) changed to Customer role.')
+    make_customer.short_description = "Make Customer"
 
 
 @admin.register(Address)

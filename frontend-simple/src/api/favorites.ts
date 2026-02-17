@@ -1,4 +1,4 @@
-import api from './axios';
+import api from './client';
 import type { Favorite, PaginatedResponse, CreateFavoriteRequest } from './types';
 
 export const favoritesApi = {
